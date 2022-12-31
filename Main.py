@@ -8,13 +8,13 @@ class WordFrame(CTkFrame):
         super().__init__(container)
         
         try:
-            static_word = kwargs['static_word']
+            self.static_word = kwargs['static_word']
         except KeyError:
-            static_word = '    '
+            self.static_word = '    '
         
         self.tiles = []
         for i in range(4):
-            tile = CTkLabel(master=self, text=static_word[i], bg_color='grey', width=50, height=50)
+            tile = CTkLabel(master=self, text=self.static_word[i], bg_color='grey', width=50, height=50)
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
     
@@ -101,24 +101,20 @@ class Main(CTk):
         
         if key.char == '\r': #ENTER
             
-            # if len(words[-1]) == 4:
-                
-            # Logic of game goes here essentially
-            
             if len(words[-1]) < 4:
                 self.post_message("Not a four letter word")
             else:
                 if words[-1] == end_word:
-                    self.post_message('You Win!')
-                    #turn everything green
+                    self.post_message('You Win! Score =', len(self.word_frames))
+                    self.word_frames[-1].colour()
+                    self.end_word_frame.colour()
                 elif (len(words) == 1 and words[-1] == start_word) or (len(words) > 1 and words[-1] == words[-2]):
                     self.post_message('No Letters Have Been Changed')
                 elif not ((len(words) == 1 and self.differs_by_one(words[-1], start_word)) or (len(words) > 1 and self.differs_by_one(words[-1], words[-2]))):
                     self.post_message('More than one letter different')
-                # elif word not in dictionary
-                    # 1) search through dictionary for each word
-                    # 2) search through entire dictionary at the start of the game and index each of start letters and jump to that index to search
-                else:    
+                elif not self.in_dictionary(words[-1]):
+                    self.post_message('Not a word in dictionary')
+                else:
                     self.post_message('Next Word')
                     self.create_new_word_frame()
         
@@ -144,6 +140,17 @@ class Main(CTk):
         
         return differ == 1
     
+    def in_dictionary(self, word):
+        global letter_index
+        global four_letter_words
+        
+        start_index = letter_index[word[0]]
+        end_char = chr(ord([*word][0])+1)
+        end_index = letter_index[end_char]
+        print('start_index:', start_index, 'end_char:', (end_char), 'end_index:', end_index)
+        
+        return word + "\n" in four_letter_words[start_index:end_index]
+    
     def post_message(self, string):
         
         print('post_message', string)
@@ -155,12 +162,18 @@ class Main(CTk):
 
 if __name__ == "__main__":
     
-    start_word = 'loop'
-    end_word = 'stop'
+    start_word = 'gift'
+    end_word = 'wrap'
     
     
-    four_letter_words = open('FourLetterWords.txt')
-    letter_index = {}
+    four_letter_words = (open('FourLetterWords.txt')).readlines()
+    letter_index = {'a' : 0}
+    
+    for i in range(1, len(four_letter_words)):
+        if four_letter_words[i][0] != four_letter_words[i-1][0]:
+            letter_index[four_letter_words[i][0]] = i
+    
+    print(letter_index)
     
     main = Main()
     main.mainloop()
