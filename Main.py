@@ -56,11 +56,15 @@ class Main(CTk):
         self.end_word_frame = WordFrame(self, static_word=end_word)
         self.end_word_frame.grid(row=100, column=1)
         
+        
         global words
         words.append('')
         self.word_frames = []
         
         self.create_new_word_frame()
+        
+        self.message_label = CTkLabel(master=self, text='', width=100, height=50)
+        self.message_label.grid(row=101, column=1)
         
     
     
@@ -97,10 +101,23 @@ class Main(CTk):
         
         if key.char == '\r': #ENTER
             
-            if len(words[-1]) == 4:
+            # if len(words[-1]) == 4:
                 
-                # Logic of game goes here essentially
-                
+            # Logic of game goes here essentially
+            
+            
+            if words[-1] == end_word:
+                self.post_message('You Win!')
+                #turn everything green
+            elif len(words[-1]) < 4:
+                self.post_message("Not a four letter word")
+            # elif len(words) > 1:
+            #     if words[-1] == words[-2]:
+            #         self.post_message("No Letters Have Been Changed")
+            elif words[-1] == words[-2]:
+                    self.post_message("No Letters Have Been Changed")
+            else:
+                self.post_message('Next Word')
                 self.create_new_word_frame()
         
         elif key.keycode == 8: #BACKSPACE
@@ -115,6 +132,16 @@ class Main(CTk):
             
         
         self.update()
+    
+    
+    def post_message(self, string):
+        
+        print('post_message')
+        
+        self.message_label.configure(text=string)
+        self.message_label.after(5000, lambda: self.message_label.configure(text=''))
+        
+    
 
 if __name__ == "__main__":
     
