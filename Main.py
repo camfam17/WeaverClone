@@ -57,8 +57,8 @@ class Main(CTk):
         self.end_word_frame.grid(row=100, column=1)
         
         
-        global words
-        words.append('')
+        # global words
+        # words.append('')
         self.word_frames = []
         
         self.create_new_word_frame()
@@ -105,20 +105,22 @@ class Main(CTk):
                 
             # Logic of game goes here essentially
             
-            
-            if words[-1] == end_word:
-                self.post_message('You Win!')
-                #turn everything green
-            elif len(words[-1]) < 4:
+            if len(words[-1]) < 4:
                 self.post_message("Not a four letter word")
-            # elif len(words) > 1:
-            #     if words[-1] == words[-2]:
-            #         self.post_message("No Letters Have Been Changed")
-            elif words[-1] == words[-2]:
-                    self.post_message("No Letters Have Been Changed")
             else:
-                self.post_message('Next Word')
-                self.create_new_word_frame()
+                if words[-1] == end_word:
+                    self.post_message('You Win!')
+                    #turn everything green
+                elif (len(words) == 1 and words[-1] == start_word) or (len(words) > 1 and words[-1] == words[-2]):
+                    self.post_message('No Letters Have Been Changed')
+                elif not ((len(words) == 1 and self.differs_by_one(words[-1], start_word)) or (len(words) > 1 and self.differs_by_one(words[-1], words[-2]))):
+                    self.post_message('More than one letter different')
+                # elif word not in dictionary
+                    # 1) search through dictionary for each word
+                    # 2) search through entire dictionary at the start of the game and index each of start letters and jump to that index to search
+                else:    
+                    self.post_message('Next Word')
+                    self.create_new_word_frame()
         
         elif key.keycode == 8: #BACKSPACE
             if len(words[-1]) > 0:
@@ -133,10 +135,18 @@ class Main(CTk):
         
         self.update()
     
+    def differs_by_one(self, word1, word2):
+        
+        differ = 0
+        for i in range(4):
+            if not word1[i] == word2[i]:
+                differ += 1
+        
+        return differ == 1
     
     def post_message(self, string):
         
-        print('post_message')
+        print('post_message', string)
         
         self.message_label.configure(text=string)
         self.message_label.after(5000, lambda: self.message_label.configure(text=''))
@@ -147,6 +157,10 @@ if __name__ == "__main__":
     
     start_word = 'loop'
     end_word = 'stop'
+    
+    
+    four_letter_words = open('FourLetterWords.txt')
+    letter_index = {}
     
     main = Main()
     main.mainloop()
