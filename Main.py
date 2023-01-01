@@ -51,14 +51,14 @@ class Main(CTk):
         self.title("WeaverClone")
         self.bind('<Key>', self.key_press)
         
+        #TODO: add scroll frame
+        
         self.start_word_frame = WordFrame(self, static_word=start_word)
         self.start_word_frame.grid(row=0, column=1)
         self.end_word_frame = WordFrame(self, static_word=end_word)
         self.end_word_frame.grid(row=100, column=1)
         
         
-        # global words
-        # words.append('')
         self.word_frames = []
         
         self.create_new_word_frame()
@@ -169,11 +169,17 @@ if __name__ == "__main__":
     four_letter_words = (open('FourLetterWords.txt')).readlines()
     letter_index = {'a' : 0}
     
+    # precompute indices of each letter, allows for faster search later on
     for i in range(1, len(four_letter_words)):
         if four_letter_words[i][0] != four_letter_words[i-1][0]:
             letter_index[four_letter_words[i][0]] = i
     
-    print(letter_index)
+    #TODO: choose start and end words
+    # 1) need an algorithm to find optimal path (graph theory?)
+    # 2) choose two random words and find shortest path between them OR:
+    # 3) chose a start/end word and word your way forwards/backwards to get the end/start word respectively (may be pointless since you need to find optimal path anyway) OR:
+    # 4) select a minimum number of guesses x you want the user to make. select a random start word and traverse their adjacent nodes x times to get x guesses away from the start word
+    # 5) create a visual graph of all the words and their adjacent nodes, show all paths from start word to end word (under certain number of guesses), look for graph visualization packages/modules
     
     main = Main()
     main.mainloop()
