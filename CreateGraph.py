@@ -49,6 +49,6 @@ for num, adj_nodes in enumerate(graph_dict.values()):
             pass    
     
 
-net.show('graph5.html')
+net.show('graphs/graph7.html')
 
 print('graph_dict:', graph_dict)
