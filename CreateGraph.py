@@ -8,7 +8,6 @@ def load_adjacency_list(file_name):
     file = open(file_name)
     adj_list = file.readlines()
     file.close()
-    # adj_list = ['2 aani 288, 353, 515, 1380, 4039, 4823, 5295, ']
     
     if len(adj_list[0]) < 3:
         adj_list.pop(0)
@@ -53,7 +52,7 @@ def add_edges(graph_dict):
             try:
                 net.add_edge(num, adj_node, physics=False)
             except:
-                pass    
+                pass 
         
 
 
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     add_nodes(adj_dict)
     add_edges(adj_dict)
     
-    graph_name = os.getcwd() + '\\graphs\\graph13.html'
+    graph_name = os.getcwd() + '\\graphs\\graph15.html'
     # net.show(graph_name)
     try:
         net.save_graph(graph_name)
@@ -80,4 +79,7 @@ if __name__ == '__main__':
         pass
     
     
-    
+    #TODO:
+    # create adjacency matrix
+    # create some sort of network storage data structure to save as file
+    # investigate different network visualization modules
