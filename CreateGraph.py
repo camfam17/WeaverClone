@@ -62,7 +62,6 @@ def create_adjacency_dictionary(adj_list):
 def create_nx_graph(adj_dict):
     
     for num, item in enumerate(adj_dict.items()):
-        print(num)
         nxnet.add_node(num, label=item[0])
         
         for adj_node in item[1]:
@@ -99,20 +98,20 @@ if __name__ == '__main__':
     adj_list = adj_list[:size]
     
     adj_dict = create_adjacency_dictionary(adj_list)
-    
+    print(adj_dict)
     # graph_name = os.getcwd() + '\\graphs\\graph15.html'
     
     
     nxnet = nx.Graph()
     create_nx_graph(adj_dict)
-    labels = nx.get_node_attributes(nxnet, 'label')
-    plt.figure(figsize=(9, 9))
-    nx.draw_random(nxnet, labels=labels)
+
+    nx.write_gexf(nxnet, 'network1 7   184 words.gexf')
     
     
-    nx.write_gexf(nxnet, 'network1 7184 words.gexf')
-    
-    # plt.show()
+    # labels = nx.get_node_attributes(nxnet, 'label')
+    # plt.figure(figsize=(9, 9))
+    # nx.draw_random(nxnet, labels=labels)    
+    # # plt.show()
     
     
     
