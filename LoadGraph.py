@@ -30,50 +30,35 @@ class LoadGraph():
         # self.print_neighbours()
     
     
-    def select_start_word(self):
-        
-        rand_num = random.randrange(0, len(self.graph.nodes))
-        
-        rand_word = self.nodes[rand_num]['label']
-        
-        print(rand_num, rand_word)
-        
-        # neighbors = self.graph.neighbors(rand_num)
-        # for n in neighbors:
-        #     print(n, self.nodes[n]['label'])
-        
-        return rand_num
-    
-    
     def get_n_steps_neighbours(self, n):
-        
-        # neighbours[step] = list of neighbours 'step' steps away
-        
-        # neighbours = [list() for i in range(n)]
-        # print('neighbours init', neighbours)
-        
-        # neighbours[0].append(self.start_node) # append start node at 0 steps away
-        # print('neighbours init2', neighbours)
-        
-        # for i in range(1, 3):
-            
-        #     prev_list = neighbours[i-1]
-        #     next_list = []
-        #     for node in prev_list:
-        #         print(type(node))
-        #         neis = self.graph.neighbors(node)
-        #         neis = list(neis)
-        #         next_list.append(neis)
-        #     neighbours[i] = next_list
         
         neighbours = nx.bfs_edges(G=self.graph, source=self.start_node, depth_limit=n)
         # neighbours = nx.bfs_predecessors(G=self.graph, source=self.start_node, depth_limit=1)
         print(neighbours)
         edges = []
+        nodes = set()
+        g = nx.Graph()
         for x in neighbours:
-            print(x)
+            # print(x)
             edges.append(x)
+            node_num1 = x[0]
+            node_label1 = self.nodes[node_num1]['label']
+            node_num2 = x[1]
+            node_label2 = self.nodes[node_num2]['label']
+            
+            if self.differs_by_one(node_label1, node_label2):
+                g.add_node(node_num1, label=node_label1)
+                g.add_node(node_num2, label=node_label2)
+                g.add_edge(node_num1, node_num2)
+                
+            
+            nodes.add((x[0], self.nodes[x[0]]['label']))
+            nodes.add((x[1], self.nodes[x[1]]['label']))
         
+        nx.write_gexf(g, 'g.gexf')
+        
+        print(edges)
+        print(nodes)
         new_graph = nx.from_edgelist(edges, self.graph)
         nx.write_gexf(new_graph, 'smallgraph.gexf')
         
@@ -82,10 +67,31 @@ class LoadGraph():
         return neighbours
     
     
+    def differs_by_one(self, word1, word2):
+    
+        differ = 0
+        for i in range(4):
+            if not word1[i] == word2[i]:
+                differ += 1
+        
+        return differ == 1
+    
+    
+    def own_bfs(self):
+        
+        # implement own bfs to return desired structure (i.e. list of list of neighbours i.e. bfs_result[step][list of neighbours 'step' steps away])
+        
+        # NBNB!: g.adjacency --> Returns an iterator over (node, adjacency dict) tuples for all nodes.
+        # use this for old approach of create your own datastructure
+        pass
+    
     def print_neighbours(self):
         print('printing neighbours...')
         print(self.neighbours)
 
+
 if __name__ == '__main__':
     
     lg = LoadGraph()
+    
+    # move all graph and dictionary editing into one file with multiple classes

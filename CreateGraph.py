@@ -41,24 +41,6 @@ def create_adjacency_dictionary(adj_list):
     return graph_dict
 
 
-# def add_nodes_pyvis(graph_dict):
-#     for num, name in enumerate(graph_dict.keys()):
-#         net.add_node(n_id=int(num), label=name, color='pink', size=30, physics=True)
-
-
-# def add_edges_pyvis(graph_dict):
-#     for num, adj_nodes in enumerate(graph_dict.values()):
-#         print(num)
-#         for adj_node in adj_nodes:
-#             # print('num', num, type(num), 'adj_node:', adj_node, type(adj_node))
-#             # net.add_edge(net.get_node(num), net.get_node(adj_node))
-#             try:
-#                 net.add_edge(num, adj_node, physics=False)
-#             except:
-#                 pass 
-        
-
-
 def create_nx_graph(adj_dict):
     
     for num, item in enumerate(adj_dict.items()):
@@ -70,23 +52,6 @@ def create_nx_graph(adj_dict):
         
     # net.add_nodes_from(adj_dict.keys())
     print(nxnet)
-
-
-# def add_nk_labels(adj_dict):
-    
-#     for num, label in enumerate(adj_dict.keys()):
-#         labels[num] = label
-
-
-# def add_nk_edges(adj_dict):
-    
-#     for num, value in enumerate(adj_dict.values()):
-#         for adj_node in value:
-            
-#             if adj_node < size:
-#                 nknet.addEdge(num, adj_node)
-    
-#     pass
 
 
 if __name__ == '__main__':
