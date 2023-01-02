@@ -105,7 +105,7 @@ class Main(CTk):
                 self.post_message("Not a four letter word")
             else:
                 if words[-1] == end_word:
-                    self.post_message('You Win! Score =', len(self.word_frames))
+                    self.post_message('You Win! Score =' + str(len(self.word_frames)))
                     self.word_frames[-1].colour()
                     self.end_word_frame.colour()
                 elif (len(words) == 1 and words[-1] == start_word) or (len(words) > 1 and words[-1] == words[-2]):
@@ -151,22 +151,20 @@ class Main(CTk):
         
         return word + "\n" in four_letter_words[start_index:end_index]
     
-    def post_message(self, string):
-        
-        print('post_message', string)
+    def post_message(self, string, time=5000):
         
         self.message_label.configure(text=string)
-        self.message_label.after(5000, lambda: self.message_label.configure(text=''))
+        self.message_label.after(time, lambda: self.message_label.configure(text=''))
         
     
 
 if __name__ == "__main__":
     
-    start_word = 'gift'
-    end_word = 'wrap'
+    start_word = 'loop'
+    end_word = 'stop'
     
     
-    four_letter_words = (open('FourLetterWords.txt')).readlines()
+    four_letter_words = (open('fourletterwordlist1.txt')).readlines()
     letter_index = {'a' : 0}
     
     # precompute indices of each letter, allows for faster search later on

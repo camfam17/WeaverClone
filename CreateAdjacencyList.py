@@ -1,5 +1,5 @@
 
-four_letter_words = open('FourLetterWords.txt').readlines()
+four_letter_words = open('fourletterwordlist1.txt').readlines()
 
 string = ''
 
@@ -26,7 +26,7 @@ for i, word1 in enumerate(four_letter_words):
 
 print(string)
 
-output_file = open('AdjacencyList.txt', 'w')
+output_file = open('AdjacencyList1.txt', 'w')
 output_file.write(string)
 
 # Can use an adjacency matrix instead? Warshalls algorithm?
