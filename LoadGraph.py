@@ -3,46 +3,130 @@ import random
 
 class LoadGraph():
     
+    # STRAT 1
+    # 1) load in graph file
+    # 2) choose a random start word
+    # 3) choose a minimum number of guess to get there
+    # 4) create steps list that is min_guess long
+    # 5) select random end word from final step
+    # 6) find shortest path/s between start word and end word 
+    # 7) find alternate, longer paths that the user may have taken
+    
+    # OR
+    
+    # STRAT 2
+    # 2) choose a random start word
+    # 3) choose a random end word
+    # 4) find shortest path/s between start word and end word (and ensure its a reasonable number of guesses away i.e. 4-10 guesses)
+    # 5) find alternate, longer paths that the user may have taken.
+    
+    
     def __init__(self, min_guesses=0):
         
-        # read in graphh from file
+        # read in graph from file
         self.graph = nx.read_gexf('network1 7184 words.gexf', node_type=int)
         print('Graph info:', nx.info(self.graph))
-        
-        # select minimum number of guesses to win game
-        if min_guesses == 0:
-            min_guesses = random.randrange(4, 10)
-        min_guesses = 4
-        print('Min guesses', min_guesses)
         
         
         self.node_data_view = self.graph.nodes(data=True)
         self.nodes = [None] * len(self.node_data_view) # list of dictionaries of labels i.e. [{'label': 'aahs'}, {}...]
+        self.node_labels = [None] * len(self.node_data_view)
         for n in self.node_data_view:
             self.nodes[n[0]] = n[1]
-        print('self.nodes', self.nodes)
-        self.answer_path = []
+            self.node_labels[n[0]] = n[1]['label']
         
-        # select a random word
+        # select a random start word
         self.start_node = random.randrange(0, len(self.graph.nodes))
-        self.start_node = 1930
-        print('start node:', self.start_node, ':', self.nodes[self.start_node])
+        # self.start_node = 1930
+        print('start node:', self.start_node, ':', self.node_labels[self.start_node])
         
-        # self.neighbours = self.bfsv1(n=min_guesses)
-        self.neighbours = self.bfsv2(n=min_guesses)
-        # self.print_neighbours()
+        
+        ##### USED FOR STRAT 1 #####
+        # select minimum number of guesses to win game
+        # if min_guesses == 0:
+        #     min_guesses = random.randrange(4, 10)
+        # min_guesses = 4
+        # print('Min guesses', min_guesses)
+        # self.steps_list = self.get_steps_list(n=min_guesses)
+        
+        
+        # USED FOR STRAT 2
+        while True:
+            self.end_node = random.randrange(0, len(self.graph.nodes))
+            
+            shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
+            
+            if self.end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
+                break
+        print('end node:', self.end_node, ':', self.node_labels[self.end_node])
+        # find shortest path between start and end node
+        # shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
+        shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
+        print('shortest_path', shortest_path)
+        print('shortest_paths', shortest_paths)
     
     
-    def bfsv3(self, n):
+    ### write func to take in list of node nums and return list of corresponding node names
+    
+    
+    # creates a list of lists neighbours[step][nodes]
+    # i.e. steps[1] is a list of all nodes 1 step away from source
+    # i.e. steps[2] is a list of all nodes 2 steps away from source
+    # not sure how useful this will be
+    def get_steps_list(self, n):
         
-        # implement own bfs to return desired structure (i.e. list of list of neighbours i.e. bfs_result[step][list of neighbours 'step' steps away])
+        steps = [list() for x in range(n)]
+        steps[0].append(self.start_node)
+        print(steps)
         
-        # NBNB!: g.adjacency --> Returns an iterator over (node, adjacency dict) tuples for all nodes.
-        # use this for old approach of create your own datastructure
+        steps_labels = [list() for x in range(n)]
+        steps_labels[0].append(self.nodes[self.start_node]['label'])
+        
+        g = nx.Graph()
+        
+        visited = set()
+        for i in range(1, 4):
+            visited.update(steps[i-1])
+            # print('i', i, ':', visited, end='')
+            
+            for prev_node in steps[i-1]:
+                neighbours = list(self.graph.neighbors(prev_node))
+                for num, neighbour in enumerate(neighbours):
+                    if neighbour not in visited:
+                        steps[i].append(neighbour)
+                        steps_labels[i].append(self.nodes[neighbour]['label'])
+                        
+                        # NB constructing graph like this is flawed. Miss out many links due to no copies of nodes in steps
+                        # see Graph 'h', recaculates differs_by_one for every node (n^2)
+                        g.add_node(neighbour, label=self.nodes[neighbour]['label'])
+                        g.add_node(prev_node, label=self.nodes[prev_node]['label'])
+                        g.add_edge(neighbour, prev_node)
+                
+            # print()
+        
+        print(steps)
+        print(steps_labels)
+        
+        nx.write_gexf(g, 'steps_graph.gexf')
+        
+        h = nx.Graph()
+        count = 0
+        for i in range(len(steps)):
+            for j in range(len(steps[i])):
+                h.add_node(count, label=steps_labels[i][j])
+                count += 1
         
         
+        for i in h.nodes(data=True):
+            num1, lab1 = i[0], i[1]['label']
+            # print(num1, lab1)
+            for j in h.nodes(data=True):
+                num2, lab2 = j[0], j[1]['label']
+                
+                if self.differs_by_one(lab1, lab2):
+                    h.add_edge(num1, num2)
         
-        pass
+        nx.write_gexf(h, 'step graph recalc diff-by-one.gexf')
     
     
     def bfsv2(self, n):
@@ -110,20 +194,6 @@ class LoadGraph():
         # parse the list of edge-tuples into layers of neighbours
         
         return neighbours
-    
-    
-    def own_bfs(self):
-        
-        # implement own bfs to return desired structure (i.e. list of list of neighbours i.e. bfs_result[step][list of neighbours 'step' steps away])
-        
-        # NBNB!: g.adjacency --> Returns an iterator over (node, adjacency dict) tuples for all nodes.
-        # use this for old approach of create your own datastructure
-        pass
-    
-    def print_neighbours(self):
-        print('printing neighbours...')
-        print(self.neighbours)
-    
     
     def differs_by_one(self, word1, word2):
         
