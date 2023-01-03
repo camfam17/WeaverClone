@@ -56,7 +56,7 @@ def create_nx_graph(adj_dict):
 
 if __name__ == '__main__':
     
-    adj_list = load_adjacency_list('AdjacencyList1.txt')
+    adj_list = load_adjacency_list('AdjacencyList3.txt')
     
     size = len(adj_list)
     # size = 300
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     nxnet = nx.Graph()
     create_nx_graph(adj_dict)
 
-    nx.write_gexf(nxnet, 'network1 7   184 words.gexf')
+    nx.write_gexf(nxnet, 'network3 2294 words.gexf')
     
     
     # labels = nx.get_node_attributes(nxnet, 'label')

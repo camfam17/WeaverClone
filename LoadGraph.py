@@ -21,23 +21,33 @@ class LoadGraph():
     # 5) find alternate, longer paths that the user may have taken.
     
     
-    def __init__(self, min_guesses=0):
+    def __init__(self):
+        
+        # self.get_new_game()
+        pass
+        
+    
+    def get_new_game(self):
         
         # read in graph from file
-        self.graph = nx.read_gexf('network1 7184 words.gexf', node_type=int)
-        print('Graph info:', nx.info(self.graph))
+        self.graph = nx.read_gexf('network2 2294 words.gexf', node_type=int)
+        print('Graph info:', nx.number_of_nodes(self.graph), 'nodes,', nx.number_of_edges(self.graph), 'edges')
         
         
         self.node_data_view = self.graph.nodes(data=True)
         self.nodes = [None] * len(self.node_data_view) # list of dictionaries of labels i.e. [{'label': 'aahs'}, {}...]
-        self.node_labels = [None] * len(self.node_data_view)
+        self.node_labels = [None] * len(self.node_data_view) # list of node labels with indices corresponding to node's number
         for n in self.node_data_view:
             self.nodes[n[0]] = n[1]
             self.node_labels[n[0]] = n[1]['label']
         
         # select a random start word
-        self.start_node = random.randrange(0, len(self.graph.nodes))
-        # self.start_node = 1930
+        while True:
+            self.start_node = random.randrange(0, len(self.graph.nodes))
+            
+            if len(list(self.graph.neighbors(self.start_node))) > 0:
+                break
+            
         print('start node:', self.start_node, ':', self.node_labels[self.start_node])
         
         
@@ -51,20 +61,38 @@ class LoadGraph():
         
         
         # USED FOR STRAT 2
+        # NB: BUG - this loop just spins if the start word as no neighbours. 
+        # first check that the start word has neighbours 
+        # and maybe have a failure counter and if the counter goes above a certain threshold then a new start word is chosen
         while True:
             self.end_node = random.randrange(0, len(self.graph.nodes))
             
-            shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
+            try:
+                shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
+            except nx.exception.NetworkXNoPath:
+                continue
             
             if self.end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
                 break
         print('end node:', self.end_node, ':', self.node_labels[self.end_node])
+        
         # find shortest path between start and end node
         # shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
         shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
         print('shortest_path', shortest_path)
         print('shortest_paths', shortest_paths)
-    
+        
+        shortest_graph = nx.Graph()
+        shortest_graph.add_node(self.start_node, label=self.node_labels[self.start_node])
+        for i in range(1, len(shortest_path)):
+            shortest_graph.add_node(shortest_path[i], label=self.node_labels[shortest_path[i]])
+            shortest_graph.add_edge(shortest_path[i-1], shortest_path[i])
+        
+        nx.write_gexf(shortest_graph, 'shortest_graph.gexf')
+        
+        # write shortest_paths to a graph
+        
+        return self.start_node, self.end_node, shortest_path, shortest_paths
     
     ### write func to take in list of node nums and return list of corresponding node names
     
@@ -208,5 +236,6 @@ class LoadGraph():
 if __name__ == '__main__':
     
     lg = LoadGraph()
+    lg.get_new_game()
     
     # move all graph and dictionary editing into one file with multiple classes

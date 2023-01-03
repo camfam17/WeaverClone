@@ -1,4 +1,5 @@
 from customtkinter import *
+from LoadGraph import LoadGraph as lg
 #Arch1
 
 words = []
@@ -14,7 +15,7 @@ class WordFrame(CTkFrame):
         
         self.tiles = []
         for i in range(4):
-            tile = CTkLabel(master=self, text=self.static_word[i], bg_color='grey', width=50, height=50)
+            tile = CTkLabel(master=self, text=self.static_word[i], bg_color='grey', width=75, height=75)
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
     
@@ -96,28 +97,28 @@ class Main(CTk):
     
     
     def key_press(self, key):
-        print('key_press: ', key)
+        # print('key_press: ', key)
         global words
         
         if key.char == '\r': #ENTER
-            
+            print(words[-1])
             if len(words[-1]) < 4:
                 self.post_message("Not a four letter word")
             else:
-                if words[-1] == end_word:
-                    self.post_message('You Win! Score =' + str(len(self.word_frames)))
-                    self.word_frames[-1].colour()
-                    self.end_word_frame.colour()
-                elif (len(words) == 1 and words[-1] == start_word) or (len(words) > 1 and words[-1] == words[-2]):
+                if (len(words) == 1 and words[-1] == start_word) or (len(words) > 1 and words[-1] == words[-2]):
                     self.post_message('No Letters Have Been Changed')
                 elif not ((len(words) == 1 and self.differs_by_one(words[-1], start_word)) or (len(words) > 1 and self.differs_by_one(words[-1], words[-2]))):
                     self.post_message('More than one letter different')
                 elif not self.in_dictionary(words[-1]):
                     self.post_message('Not a word in dictionary')
+                elif words[-1] == end_word:
+                    self.post_message('You Win! Score =' + str(len(self.word_frames)))
+                    self.word_frames[-1].colour()
+                    self.end_word_frame.colour()
                 else:
                     self.post_message('Next Word')
                     self.create_new_word_frame()
-        
+            
         elif key.keycode == 8: #BACKSPACE
             if len(words[-1]) > 0:
                 words[-1] = words[-1][:-1]
@@ -140,16 +141,18 @@ class Main(CTk):
         
         return differ == 1
     
+    # check if word is in dictionary. only searches words in dictionary starting with the same first letter as the submitted word (better efficiency)
     def in_dictionary(self, word):
         global letter_index
         global four_letter_words
         
-        start_index = letter_index[word[0]]
-        end_char = chr(ord([*word][0])+1)
-        end_index = letter_index[end_char]
-        print('start_index:', start_index, 'end_char:', (end_char), 'end_index:', end_index)
+        start_char = word[0]
+        start_index = letter_index[start_char]
+        next_char = chr(ord(start_char)+1)
+        next_char_index = letter_index[next_char]
+        print('start_char:', start_char, 'start_index:', start_index, 'next_char:', next_char, 'next_char_index:', next_char_index)
         
-        return word + "\n" in four_letter_words[start_index:end_index]
+        return word + "\n" in four_letter_words[start_index:next_char_index]
     
     def post_message(self, string, time=5000):
         
@@ -160,17 +163,26 @@ class Main(CTk):
 
 if __name__ == "__main__":
     
-    start_word = 'loop'
-    end_word = 'stop'
+    # start_word = 'loop'
+    # end_word = 'stop'
     
+    file = open('fourletterwordlist3.txt')
+    four_letter_words = file.readlines()
+    file.close()
     
-    four_letter_words = (open('fourletterwordlist1.txt')).readlines()
-    letter_index = {'a' : 0}
     
     # precompute indices of each letter, allows for faster search later on
+    letter_index = {'a' : 0}
     for i in range(1, len(four_letter_words)):
         if four_letter_words[i][0] != four_letter_words[i-1][0]:
             letter_index[four_letter_words[i][0]] = i
+    print(letter_index)
+    
+    g = lg()
+    start_node, end_node, shortest_path, shortest_paths = g.get_new_game()
+    
+    start_word = four_letter_words[start_node][:-1]
+    end_word = four_letter_words[end_node][:-1]
     
     #TODO: choose start and end words
     # 1) need an algorithm to find optimal path (graph theory?)
