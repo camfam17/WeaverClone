@@ -56,6 +56,7 @@ class Main(CTk):
         
         self.start_word_frame = WordFrame(self, static_word=start_word)
         self.start_word_frame.grid(row=0, column=1)
+        self.start_word_frame.colour()
         self.end_word_frame = WordFrame(self, static_word=end_word)
         self.end_word_frame.grid(row=100, column=1)
         
@@ -183,6 +184,9 @@ if __name__ == "__main__":
     
     start_word = four_letter_words[start_node][:-1]
     end_word = four_letter_words[end_node][:-1]
+    
+    start_word = 'loop'
+    end_word = 'stop'
     
     #TODO: choose start and end words
     # 1) need an algorithm to find optimal path (graph theory?)

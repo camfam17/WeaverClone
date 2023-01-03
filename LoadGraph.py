@@ -87,10 +87,18 @@ class LoadGraph():
         for i in range(1, len(shortest_path)):
             shortest_graph.add_node(shortest_path[i], label=self.node_labels[shortest_path[i]])
             shortest_graph.add_edge(shortest_path[i-1], shortest_path[i])
-        
         nx.write_gexf(shortest_graph, 'shortest_graph.gexf')
         
-        # write shortest_paths to a graph
+        shortest_graphs = nx.Graph()
+        # TODO: write shortest_paths to a graph, with different path's edges in different colours?
+        for i in range(len(shortest_paths)):
+            shortest_graphs.add_node(shortest_paths[i][0], label=self.node_labels[shortest_paths[i][0]])
+            for j in range(1, len(shortest_paths[i])):
+                
+                shortest_graphs.add_node(shortest_paths[i][j], label=self.node_labels[shortest_paths[i][j]])
+                # shortest_graphs.add_node(j, label=self.node_labels[j])
+                shortest_graphs.add_edge(shortest_paths[i][j-1], shortest_paths[i][j])
+        nx.write_gexf(shortest_graphs, 'shortest_graphs.gexf')
         
         return self.start_node, self.end_node, shortest_path, shortest_paths
     
