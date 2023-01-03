@@ -76,11 +76,12 @@ class LoadGraph():
                 break
         print('end node:', self.end_node, ':', self.node_labels[self.end_node])
         
-        # find shortest path between start and end node
-        # shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
         shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
+        # all_paths = nx.all_simple_paths(G=self.graph, source=self.start_node, target=self.end_node, cutoff=6)
+        
         print('shortest_path', shortest_path)
         print('shortest_paths', shortest_paths)
+        # print('all_paths:', all_paths)
         
         shortest_graph = nx.Graph()
         shortest_graph.add_node(self.start_node, label=self.node_labels[self.start_node])
@@ -100,6 +101,7 @@ class LoadGraph():
                 shortest_graphs.add_edge(shortest_paths[i][j-1], shortest_paths[i][j])
         nx.write_gexf(shortest_graphs, 'shortest_graphs.gexf')
         
+        print('Done')
         return self.start_node, self.end_node, shortest_path, shortest_paths
     
     ### write func to take in list of node nums and return list of corresponding node names

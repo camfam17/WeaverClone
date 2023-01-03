@@ -185,8 +185,8 @@ if __name__ == "__main__":
     start_word = four_letter_words[start_node][:-1]
     end_word = four_letter_words[end_node][:-1]
     
-    start_word = 'loop'
-    end_word = 'stop'
+    # start_word = 'loop'
+    # end_word = 'stop'
     
     #TODO: choose start and end words
     # 1) need an algorithm to find optimal path (graph theory?)
