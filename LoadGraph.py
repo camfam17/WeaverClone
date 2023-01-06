@@ -22,7 +22,7 @@ class LoadGraph():
     
     
     def __init__(self):
-        
+        #fjd
         # self.get_new_game()
         pass
         

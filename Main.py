@@ -96,7 +96,7 @@ class Main(CTk):
         
         # if len(self.word_frames) >= 4:
         #     self.addScrollbar()
-        
+        # dwdd
         global words
         words.append('')
     
