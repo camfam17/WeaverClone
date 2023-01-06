@@ -56,6 +56,8 @@ class Main(CTk):
         super().__init__()
         
         self.title("WeaverClone")
+        # self.geometry('380x600')
+        self.geometry('420x600')
         self.bind('<Key>', self.key_press)
         
         #TODO: add scroll frame
@@ -69,8 +71,24 @@ class Main(CTk):
         
         self.word_frames = []
         
-        self.create_new_word_frame()
+        # self.create_new_word_frame()
         
+        mainframe = CTkFrame(master=self, width=450)
+        mainframe.grid(row=1, column=1)
+        
+        scrollcanvas = CTkCanvas(master=mainframe)
+        scrollcanvas.grid(row=1, column=1)
+        scrollbar = CTkScrollbar(master=mainframe, command=scrollcanvas.yview)
+        scrollbar.grid(row=1, column=100)
+        scrollcanvas.configure(yscrollcommand=scrollbar.set)
+        scrollcanvas.bind('<Configure>', lambda e: scrollcanvas.configure(scrollregion=scrollcanvas.bbox('all')))
+        
+        scrollwindow = CTkFrame(master=scrollcanvas)
+        scrollcanvas.create_window((0, 0), window=scrollwindow, anchor='nw')
+        testwordframes = []
+        for i in range(10):
+            testwordframes.append(WordFrame(container=scrollwindow))
+            testwordframes[-1].grid(row=i, column=1)
         
         
         self.message_label = CTkLabel(master=self, text='', width=100, height=50)

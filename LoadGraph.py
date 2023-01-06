@@ -60,6 +60,7 @@ class LoadGraph():
         # self.steps_list = self.get_steps_list(n=min_guesses)
         
         
+        ######################### NB: this loop still spins sometimes. Must add fail counter! ###############################
         # USED FOR STRAT 2
         # NB: BUG - this loop just spins if the start word as no neighbours. 
         # first check that the start word has neighbours 
