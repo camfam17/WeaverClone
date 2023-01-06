@@ -71,25 +71,25 @@ class Main(CTk):
         
         self.word_frames = []
         
-        # self.create_new_word_frame()
         
-        mainframe = CTkFrame(master=self, width=450)
-        mainframe.grid(row=1, column=1)
         
-        scrollcanvas = CTkCanvas(master=mainframe)
-        scrollcanvas.grid(row=1, column=1)
-        scrollbar = CTkScrollbar(master=mainframe, command=scrollcanvas.yview)
-        scrollbar.grid(row=1, column=100)
-        scrollcanvas.configure(yscrollcommand=scrollbar.set)
-        scrollcanvas.bind('<Configure>', lambda e: scrollcanvas.configure(scrollregion=scrollcanvas.bbox('all')))
+        self.mainframe = CTkFrame(master=self, width=450, border_color='red', border_width=5)
+        self.mainframe.grid(row=1, column=1)
+        self.scrollcanvas = CTkCanvas(master=self.mainframe, highlightbackground='green', highlightthickness=5)
+        self.scrollcanvas.grid(row=0, column=1)
+        self.scrollbar = CTkScrollbar(master=self.mainframe, command=self.scrollcanvas.yview, fg_color='pink')
+        self.scrollbar.grid(row=0, column=100)
+        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
-        scrollwindow = CTkFrame(master=scrollcanvas)
-        scrollcanvas.create_window((0, 0), window=scrollwindow, anchor='nw')
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=380, border_color='blue', border_width=5)
+        self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         testwordframes = []
         for i in range(10):
-            testwordframes.append(WordFrame(container=scrollwindow))
+            testwordframes.append(WordFrame(container=self.scrollwindow))
             testwordframes[-1].grid(row=i, column=1)
         
+        # self.create_new_word_frame()
         
         self.message_label = CTkLabel(master=self, text='', width=100, height=50)
         self.message_label.grid(row=101, column=1)
@@ -98,19 +98,22 @@ class Main(CTk):
     
     def addScrollbar(self):
         
-        self.scrollbar = CTkScrollbar(master=self, width=30, height=300)
-        for frame in self.word_frames:
-            # frame.configure(master=self.scrollbar)
-            # frame.move(self.scrollbar.set)
-            frame.config(command=self.scrollbar.set)
+        # self.scrollbar = CTkScrollbar(master=self, width=30, height=300)
+        # for frame in self.word_frames:
+        #     # frame.configure(master=self.scrollbar)
+        #     # frame.move(self.scrollbar.set)
+        #     frame.config(command=self.scrollbar.set)
         
-        self.scrollbar.grid(row=99, column=1)
+        # self.scrollbar.grid(row=99, column=1)
+        pass
 
     
     def create_new_word_frame(self):
         
-        self.word_frames.append(WordFrame(self))
-        self.word_frames[-1].grid(row=len(self.word_frames), column=1)
+        self.word_frames.append(WordFrame(container=self.scrollwindow))
+        self.word_frames[-1].grid(row=len(self.word_frames), column=1, sticky='n')
+        print('len:', len(self.word_frames))
+        self.scrollwindow.update()
         
         # if len(self.word_frames) >= 4:
         #     self.addScrollbar()
