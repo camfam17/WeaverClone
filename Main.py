@@ -13,9 +13,11 @@ class WordFrame(CTkFrame):
         except KeyError:
             self.static_word = '    '
         
+        font1 = CTkFont(family='Arial', size=35, weight='bold')
+        
         self.tiles = []
         for i in range(4):
-            tile = CTkLabel(master=self, text=self.static_word[i], bg_color='grey', width=75, height=75)
+            tile = CTkLabel(master=self, text=self.static_word[i], font=font1, bg_color='grey', width=75, height=75)
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
     
@@ -42,6 +44,10 @@ class WordFrame(CTkFrame):
         
         for tile in self.tiles:
             tile.configure(bg_color='grey')
+    
+    
+    def move(self, new_command):
+        self.configure(command=new_command)
 
 
 class Main(CTk):
@@ -65,15 +71,31 @@ class Main(CTk):
         
         self.create_new_word_frame()
         
+        
+        
         self.message_label = CTkLabel(master=self, text='', width=100, height=50)
         self.message_label.grid(row=101, column=1)
         
     
     
+    def addScrollbar(self):
+        
+        self.scrollbar = CTkScrollbar(master=self, width=30, height=300)
+        for frame in self.word_frames:
+            # frame.configure(master=self.scrollbar)
+            # frame.move(self.scrollbar.set)
+            frame.config(command=self.scrollbar.set)
+        
+        self.scrollbar.grid(row=99, column=1)
+
+    
     def create_new_word_frame(self):
         
         self.word_frames.append(WordFrame(self))
         self.word_frames[-1].grid(row=len(self.word_frames), column=1)
+        
+        # if len(self.word_frames) >= 4:
+        #     self.addScrollbar()
         
         global words
         words.append('')
@@ -100,6 +122,7 @@ class Main(CTk):
     def key_press(self, key):
         # print('key_press: ', key)
         global words
+        
         
         if key.char == '\r': #ENTER
             print(words[-1])
@@ -131,6 +154,7 @@ class Main(CTk):
                 words[-1] += key.char
             
         
+        print(words)
         self.update()
     
     def differs_by_one(self, word1, word2):
@@ -151,9 +175,10 @@ class Main(CTk):
         start_index = letter_index[start_char]
         next_char = chr(ord(start_char)+1)
         next_char_index = letter_index[next_char]
-        print('start_char:', start_char, 'start_index:', start_index, 'next_char:', next_char, 'next_char_index:', next_char_index)
+        # print('start_char:', start_char, 'start_index:', start_index, 'next_char:', next_char, 'next_char_index:', next_char_index)
         
         return word + "\n" in four_letter_words[start_index:next_char_index]
+    
     
     def post_message(self, string, time=5000):
         
