@@ -82,11 +82,12 @@ class Main(CTk):
         self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
         self.scrollbar = CTkScrollbar(master=self.mainframe, command=self.scrollcanvas.yview, fg_color='pink', orientation='vertical')
         # self.scrollbar.grid(row=0, column=100)
-        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
+        # self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
+        # self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
         self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=380, border_color='blue', border_width=5)
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
+        
         # testwordframes = []
         # for i in range(10):
         #     testwordframes.append(WordFrame(container=self.scrollwindow))
@@ -98,12 +99,13 @@ class Main(CTk):
         self.message_label.grid(row=3, column=1)
         
     
-    
     def addScrollbar(self):
         
         # self.columnconfigure(100, weight=1)
         # self.scrollbar.grid(row=0, column=100)
         self.scrollbar.pack(side=RIGHT)
+        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
         pass
 
