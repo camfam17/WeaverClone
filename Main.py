@@ -48,7 +48,9 @@ class WordFrame(CTkFrame):
     
     def move(self, new_command):
         self.configure(command=new_command)
-
+    
+    def reposit(self, new_container):
+        super().__init__(new_container)
 
 class Main(CTk):
     
@@ -63,10 +65,10 @@ class Main(CTk):
         #TODO: add scroll frame
         
         self.start_word_frame = WordFrame(self, static_word=start_word)
-        self.start_word_frame.grid(row=0, column=1)
+        self.start_word_frame.grid(row=0, column=1, pady=10)
         self.start_word_frame.colour()
         self.end_word_frame = WordFrame(self, static_word=end_word)
-        self.end_word_frame.grid(row=100, column=1)
+        self.end_word_frame.grid(row=2, column=1, pady=10)
         
         
         self.word_frames = []
@@ -76,47 +78,55 @@ class Main(CTk):
         self.mainframe = CTkFrame(master=self, width=450, border_color='red', border_width=5)
         self.mainframe.grid(row=1, column=1)
         self.scrollcanvas = CTkCanvas(master=self.mainframe, highlightbackground='green', highlightthickness=5)
-        self.scrollcanvas.grid(row=0, column=1)
-        self.scrollbar = CTkScrollbar(master=self.mainframe, command=self.scrollcanvas.yview, fg_color='pink')
-        self.scrollbar.grid(row=0, column=100)
+        # self.scrollcanvas.grid(row=0, column=1)
+        self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
+        self.scrollbar = CTkScrollbar(master=self.mainframe, command=self.scrollcanvas.yview, fg_color='pink', orientation='vertical')
+        # self.scrollbar.grid(row=0, column=100)
         self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
         self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=380, border_color='blue', border_width=5)
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
-        testwordframes = []
-        for i in range(10):
-            testwordframes.append(WordFrame(container=self.scrollwindow))
-            testwordframes[-1].grid(row=i, column=1)
+        # testwordframes = []
+        # for i in range(10):
+        #     testwordframes.append(WordFrame(container=self.scrollwindow))
+        #     testwordframes[-1].grid(row=i, column=1)
         
-        # self.create_new_word_frame()
+        self.create_new_word_frame()
         
         self.message_label = CTkLabel(master=self, text='', width=100, height=50)
-        self.message_label.grid(row=101, column=1)
+        self.message_label.grid(row=3, column=1)
         
     
     
     def addScrollbar(self):
         
-        # self.scrollbar = CTkScrollbar(master=self, width=30, height=300)
-        # for frame in self.word_frames:
-        #     # frame.configure(master=self.scrollbar)
-        #     # frame.move(self.scrollbar.set)
-        #     frame.config(command=self.scrollbar.set)
+        # self.columnconfigure(100, weight=1)
+        # self.scrollbar.grid(row=0, column=100)
+        self.scrollbar.pack(side=RIGHT)
         
-        # self.scrollbar.grid(row=99, column=1)
         pass
+
 
     
     def create_new_word_frame(self):
         
+        # if hasattr(self, 'scrollwindow'):
+        #     self.word_frames.append(WordFrame(container=self.scrollwindow))
+        # else:
+        #     self.word_frames.append(WordFrame(container=self))
         self.word_frames.append(WordFrame(container=self.scrollwindow))
         self.word_frames[-1].grid(row=len(self.word_frames), column=1, sticky='n')
+        # self.word_frames[-1].pack(side=BOTTOM)
         print('len:', len(self.word_frames))
-        self.scrollwindow.update()
         
-        # if len(self.word_frames) >= 4:
-        #     self.addScrollbar()
+        if hasattr(self, 'scrollwindow'):
+            self.scrollwindow.update()
+        
+        
+        if len(self.word_frames) >= 4:
+            self.addScrollbar()
+        
         # dwdd
         global words
         words.append('')
