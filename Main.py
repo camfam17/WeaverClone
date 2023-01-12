@@ -85,7 +85,7 @@ class Main(CTk):
         # self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
         # self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
-        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=380, border_color='blue', border_width=5)
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=381, border_color='blue', border_width=5)
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         
         # testwordframes = []
@@ -104,12 +104,21 @@ class Main(CTk):
         # self.columnconfigure(100, weight=1)
         # self.scrollbar.grid(row=0, column=100)
         self.scrollbar.pack(side=RIGHT)
-        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
+        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set, confine=True)
+        # self.ownset()
+        print('canvas1', type(self.scrollcanvas.bbox('all')))
+        self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
+        # self.scrollcanvas.bind('<Configure>', self.ownset())
+        
+        print('canvas2', self.scrollcanvas.bbox('all'))
         
         pass
 
-
+    def ownset(self):
+        
+        print('get:', self.scrollbar.get())
+        
+        return self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all'))
     
     def create_new_word_frame(self):
         
@@ -126,7 +135,7 @@ class Main(CTk):
             self.scrollwindow.update()
         
         
-        if len(self.word_frames) >= 4:
+        if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
             self.addScrollbar()
         
         # dwdd
