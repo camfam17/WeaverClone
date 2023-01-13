@@ -104,13 +104,13 @@ class Main(CTk):
         # self.columnconfigure(100, weight=1)
         # self.scrollbar.grid(row=0, column=100)
         self.scrollbar.pack(side=RIGHT)
-        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set, confine=True)
+        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
         # self.ownset()
-        print('canvas1', type(self.scrollcanvas.bbox('all')))
+        # print('canvas1', type(self.scrollcanvas.bbox('all')))
         self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         # self.scrollcanvas.bind('<Configure>', self.ownset())
         
-        print('canvas2', self.scrollcanvas.bbox('all'))
+        # print('canvas2', self.scrollcanvas.bbox('all'))
         
         pass
 
@@ -137,10 +137,17 @@ class Main(CTk):
         
         if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
             self.addScrollbar()
+            print('scrollbar', self.scrollbar.get())
+            self.scrollbar.set((len(self.word_frames)-1-3)/(len(self.word_frames)-1), 1.0)
+            # self.scrollcanvas.yview((len(self.word_frames)-1-3)/(len(self.word_frames)-1), 1.0)
+            self.scrollcanvas.yview_scroll(1, 'pages')
+            # self.scrollcanvas.yview_moveto
         
         # dwdd
         global words
         words.append('')
+        
+        
     
     
     def delete_last_word_frame(self):
@@ -196,7 +203,7 @@ class Main(CTk):
                 words[-1] += key.char
             
         
-        print(words)
+        # print(words)
         self.update()
     
     def differs_by_one(self, word1, word2):
