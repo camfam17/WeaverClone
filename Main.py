@@ -100,25 +100,10 @@ class Main(CTk):
         
     
     def addScrollbar(self):
-        
-        # self.columnconfigure(100, weight=1)
-        # self.scrollbar.grid(row=0, column=100)
         self.scrollbar.pack(side=RIGHT)
         self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
-        # self.ownset()
-        # print('canvas1', type(self.scrollcanvas.bbox('all')))
         self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
-        # self.scrollcanvas.bind('<Configure>', self.ownset())
         
-        # print('canvas2', self.scrollcanvas.bbox('all'))
-        
-        pass
-
-    def ownset(self):
-        
-        print('get:', self.scrollbar.get())
-        
-        return self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all'))
     
     def create_new_word_frame(self):
         
@@ -154,6 +139,13 @@ class Main(CTk):
             words.pop(-1)
             
             self.word_frames[-1].uncolour()
+            
+            # scroll up
+            # NB: need to scroll up, but also reduce the size of the scrollcanvas/scrollwindow now that there is empty space left by the deleted WordFrame
+            if hasattr(self, 'scrollwindow'):
+                self.scrollwindow.update() # maybe does nothing
+            self.scrollcanvas.yview_scroll(-100, 'units')
+
     
     
     def update(self):
