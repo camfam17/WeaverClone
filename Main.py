@@ -138,10 +138,7 @@ class Main(CTk):
         if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
             self.addScrollbar()
             print('scrollbar', self.scrollbar.get())
-            self.scrollbar.set((len(self.word_frames)-1-3)/(len(self.word_frames)-1), 1.0)
-            # self.scrollcanvas.yview((len(self.word_frames)-1-3)/(len(self.word_frames)-1), 1.0)
-            self.scrollcanvas.yview_scroll(1, 'pages')
-            # self.scrollcanvas.yview_moveto
+            self.scrollcanvas.yview_scroll(100, 'pages') # scroll to bottom each time a word is entered
         
         # dwdd
         global words
