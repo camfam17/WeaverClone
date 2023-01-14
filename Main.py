@@ -87,6 +87,8 @@ class Main(CTk):
         
         self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=381, border_color='blue', border_width=5)
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
+        # print('yscrollincrement', self.scrollcanvas['yscrollincrement'])
+        # self.scrollcanvas.configure(yscrollincrement='1')
         
         # testwordframes = []
         # for i in range(10):
@@ -140,11 +142,21 @@ class Main(CTk):
             
             self.word_frames[-1].uncolour()
             
+            if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
+                # self.removeScrollbar()
+                pass
+            
             # scroll up
             # NB: need to scroll up, but also reduce the size of the scrollcanvas/scrollwindow now that there is empty space left by the deleted WordFrame
+            # self.scrollcanvas.yview_scroll(-95, 'units')
             if hasattr(self, 'scrollwindow'):
-                self.scrollwindow.update() # maybe does nothing
-            self.scrollcanvas.yview_scroll(-100, 'units')
+                self.scrollwindow.update() # necesarry for resizing
+            if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
+                # self.addScrollbar() # calling the bind configure method resizes the canvas
+                self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
+            self.scrollcanvas.yview_scroll(100, 'pages')
+
+
 
     
     
