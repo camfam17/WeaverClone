@@ -59,10 +59,8 @@ class Main(CTk):
         
         self.title("WeaverClone")
         # self.geometry('380x600')
-        self.geometry('420x600')
+        # self.geometry('420x600')
         self.bind('<Key>', self.key_press)
-        
-        #TODO: add scroll frame
         
         self.start_word_frame = WordFrame(self, static_word=start_word)
         self.start_word_frame.grid(row=0, column=1, pady=10)
@@ -74,26 +72,14 @@ class Main(CTk):
         self.word_frames = []
         
         
-        
         self.mainframe = CTkFrame(master=self, width=450, border_color='red', border_width=5)
         self.mainframe.grid(row=1, column=1)
         self.scrollcanvas = CTkCanvas(master=self.mainframe, highlightbackground='green', highlightthickness=5)
-        # self.scrollcanvas.grid(row=0, column=1)
         self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
         self.scrollbar = CTkScrollbar(master=self.mainframe, command=self.scrollcanvas.yview, fg_color='pink', orientation='vertical')
-        # self.scrollbar.grid(row=0, column=100)
-        # self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
-        # self.scrollcanvas.bind('<Configure>', lambda e: self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
         self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=381, border_color='blue', border_width=5)
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
-        # print('yscrollincrement', self.scrollcanvas['yscrollincrement'])
-        # self.scrollcanvas.configure(yscrollincrement='1')
-        
-        # testwordframes = []
-        # for i in range(10):
-        #     testwordframes.append(WordFrame(container=self.scrollwindow))
-        #     testwordframes[-1].grid(row=i, column=1)
         
         self.create_new_word_frame()
         
@@ -101,21 +87,24 @@ class Main(CTk):
         self.message_label.grid(row=3, column=1)
         
     
+    
     def addScrollbar(self):
         self.scrollbar.pack(side=RIGHT)
         self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
     
+    
+    def removeScrollbar(self):
+        print('remove attempt')
+        # self.scrollbar.grid_remove()
+        self.scrollbar.pack_forget()
+    
+    
     def create_new_word_frame(self):
         
-        # if hasattr(self, 'scrollwindow'):
-        #     self.word_frames.append(WordFrame(container=self.scrollwindow))
-        # else:
-        #     self.word_frames.append(WordFrame(container=self))
         self.word_frames.append(WordFrame(container=self.scrollwindow))
         self.word_frames[-1].grid(row=len(self.word_frames), column=1, sticky='n')
-        # self.word_frames[-1].pack(side=BOTTOM)
         print('len:', len(self.word_frames))
         
         if hasattr(self, 'scrollwindow'):
@@ -131,6 +120,8 @@ class Main(CTk):
         global words
         words.append('')
         
+        # if scrollbar not at bottom:
+        #   scroll to bottom
         
     
     
@@ -142,21 +133,24 @@ class Main(CTk):
             
             self.word_frames[-1].uncolour()
             
-            if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
-                # self.removeScrollbar()
-                pass
-            
-            # scroll up
-            # NB: need to scroll up, but also reduce the size of the scrollcanvas/scrollwindow now that there is empty space left by the deleted WordFrame
-            # self.scrollcanvas.yview_scroll(-95, 'units')
             if hasattr(self, 'scrollwindow'):
                 self.scrollwindow.update() # necesarry for resizing
-            if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
+                
+            # if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
                 # self.addScrollbar() # calling the bind configure method resizes the canvas
-                self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
-            self.scrollcanvas.yview_scroll(100, 'pages')
-
-
+            self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
+            
+            if len(self.word_frames) == 3:
+                self.removeScrollbar()
+            
+            # NOTE: this is causing all wordframes to disappear off screen
+            # self.scrollcanvas.yview_scroll(100, 'pages')
+            # self.scrollcanvas.configure(yscrollincrement='1')
+            # self.scrollcanvas.yview_scroll(-95, 'units')
+            
+            
+            # if scrollbar not at bottom:
+                # scroll to bottom
 
     
     
