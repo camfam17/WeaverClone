@@ -1,6 +1,9 @@
 from customtkinter import *
 from LoadGraph import LoadGraph as lg
-#Arch1
+
+
+# TODO: colour letters green in end word frame that are matching in most recent full word
+
 
 words = []
 class WordFrame(CTkFrame):
@@ -45,12 +48,6 @@ class WordFrame(CTkFrame):
         for tile in self.tiles:
             tile.configure(bg_color='grey')
     
-    
-    def move(self, new_command):
-        self.configure(command=new_command)
-    
-    def reposit(self, new_container):
-        super().__init__(new_container)
 
 class Main(CTk):
     
@@ -96,8 +93,6 @@ class Main(CTk):
     
     
     def removeScrollbar(self):
-        print('remove attempt')
-        # self.scrollbar.grid_remove()
         self.scrollbar.pack_forget()
     
     
@@ -122,6 +117,8 @@ class Main(CTk):
         
         # if scrollbar not at bottom:
         #   scroll to bottom
+        
+        # print(self.scrollbar.get())
         
     
     
@@ -180,7 +177,7 @@ class Main(CTk):
                 elif not self.in_dictionary(words[-1]):
                     self.post_message('Not a word in dictionary')
                 elif words[-1] == end_word:
-                    self.post_message('You Win! Score =' + str(len(self.word_frames)))
+                    self.post_message('You Win! Score = ' + str(len(self.word_frames)))
                     self.word_frames[-1].colour()
                     self.end_word_frame.colour()
                 else:
@@ -200,6 +197,8 @@ class Main(CTk):
         
         # print(words)
         self.update()
+        
+        self.scrollcanvas.yview_moveto(0.9)
     
     def differs_by_one(self, word1, word2):
         
