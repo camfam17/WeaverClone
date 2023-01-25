@@ -25,6 +25,8 @@ class WordFrame(CTkFrame):
             tile = CTkLabel(master=self, text=self.static_word[i], font=font1, bg_color='grey', width=letter_tile_length, height=letter_tile_length)
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
+        
+        self.configure(border_color='purple', border_width=5)
     
     
     def update(self):
@@ -62,10 +64,10 @@ class Main(CTk):
         self.bind('<Key>', self.key_press)
         
         self.start_word_frame = WordFrame(self, static_word=start_word)
-        self.start_word_frame.grid(row=0, column=1, pady=10)
+        self.start_word_frame.grid(row=0, column=1, padx=10, pady=10, sticky='w')
         self.start_word_frame.colour()
         self.end_word_frame = WordFrame(self, static_word=end_word)
-        self.end_word_frame.grid(row=2, column=1, pady=10)
+        self.end_word_frame.grid(row=2, column=1, padx=10, pady=10, sticky='w')
         
         
         self.word_frames = []
@@ -73,13 +75,13 @@ class Main(CTk):
         
         self.mainframe = CTkFrame(master=self, border_color='red', border_width=5)
         self.mainframe.grid(row=1, column=1)
-        self.scrollcanvas = CTkCanvas(master=self.mainframe, highlightbackground='green', highlightthickness=5)
+        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, highlightbackground='green', highlightthickness=5)
         # self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
         self.scrollcanvas.grid(row=2, column=1)
         self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, fg_color='pink', orientation='vertical', width=18) #, command=self.scrollcanvas.yview
         self.scrollbar.grid(row=0, column=100, rowspan=100)
         
-        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width, border_color='blue', border_width=5)
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20, border_color='blue', border_width=5)
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         
         self.create_new_word_frame()
@@ -89,7 +91,7 @@ class Main(CTk):
         
     
     
-    def addScrollbar(self):
+    def activateScrollbar(self):
         # self.scrollbar.pack(side=RIGHT)
         self.scrollbar.configure(command=self.scrollcanvas.yview, hover=True)
         # self.scrollbar.grid(row=0, column=100, rowspan=100)
@@ -98,7 +100,7 @@ class Main(CTk):
         
     
     
-    def removeScrollbar(self):
+    def deactivateScrollbar(self):
         # self.scrollbar.pack_forget()
         # self.scrollbar.grid_forget()
         self.scrollbar.configure(command=None, hover=False)
@@ -107,25 +109,27 @@ class Main(CTk):
     def create_new_word_frame(self):
         
         self.word_frames.append(WordFrame(container=self.scrollwindow))
-        self.word_frames[-1].grid(row=len(self.word_frames), column=1, sticky='n')
+        self.word_frames[-1].grid(row=len(self.word_frames), column=1, padx=10) #, sticky='n'
         
         if hasattr(self, 'scrollwindow'):
             self.scrollwindow.update()
         
         
         if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
-            self.addScrollbar()
+            self.activateScrollbar()
             print('scrollbar', self.scrollbar.get())
             # self.scrollcanvas.yview_scroll(100, 'pages') # scroll to bottom each time a word is entered
+        else:
+            self.scrollcanvas.configure(width=self.scrollwindow.winfo_width(), height=self.scrollwindow.winfo_height())
+            print('widthheight:', self.scrollwindow.winfo_width(), self.scrollwindow.winfo_height())
         
-        # dwdd
+        
         global words
         words.append('')
         
-        # if scrollbar not at bottom:
-        #   scroll to bottom
-        
-        # print(self.scrollbar.get())
+        # if len(self.word_frames) <=3:
+            # self.scrollcanvas.configure(width=self.scrollwindow.winfo_width(), height=self.scrollwindow.winfo_height())
+            # print('widthheight:', self.scrollwindow.winfo_width(), self.scrollwindow.winfo_height())
         
     
     
@@ -145,7 +149,7 @@ class Main(CTk):
             self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
             
             if len(self.word_frames) == 3:
-                self.removeScrollbar()
+                self.deactivateScrollbar()
             
             # NOTE: this is causing all wordframes to disappear off screen
             # self.scrollcanvas.yview_scroll(100, 'pages')
@@ -173,7 +177,7 @@ class Main(CTk):
         
         
         if key.char == '\r': #ENTER
-            print(words[-1])
+            # print(words[-1])
             if len(words[-1]) < 4:
                 self.post_message("Not a four letter word")
             else:
@@ -201,8 +205,6 @@ class Main(CTk):
             if len(words[-1]) < 4:
                 words[-1] += key.char
             
-        
-        # print(words)
         self.update()
         
         #Scroll to bottom of screen
