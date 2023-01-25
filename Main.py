@@ -4,6 +4,8 @@ from LoadGraph import LoadGraph as lg
 
 # TODO: colour letters green in end word frame that are matching in most recent full word
 
+letter_tile_length = 75
+word_frame_width = 4*75 + 8*10 # = 380
 
 words = []
 class WordFrame(CTkFrame):
@@ -20,7 +22,7 @@ class WordFrame(CTkFrame):
         
         self.tiles = []
         for i in range(4):
-            tile = CTkLabel(master=self, text=self.static_word[i], font=font1, bg_color='grey', width=75, height=75)
+            tile = CTkLabel(master=self, text=self.static_word[i], font=font1, bg_color='grey', width=letter_tile_length, height=letter_tile_length)
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
     
@@ -69,13 +71,15 @@ class Main(CTk):
         self.word_frames = []
         
         
-        self.mainframe = CTkFrame(master=self, width=450, border_color='red', border_width=5)
+        self.mainframe = CTkFrame(master=self, border_color='red', border_width=5)
         self.mainframe.grid(row=1, column=1)
         self.scrollcanvas = CTkCanvas(master=self.mainframe, highlightbackground='green', highlightthickness=5)
-        self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
-        self.scrollbar = CTkScrollbar(master=self.mainframe, command=self.scrollcanvas.yview, fg_color='pink', orientation='vertical')
+        # self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
+        self.scrollcanvas.grid(row=2, column=1)
+        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, fg_color='pink', orientation='vertical', width=18) #, command=self.scrollcanvas.yview
+        self.scrollbar.grid(row=0, column=100, rowspan=100)
         
-        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=381, border_color='blue', border_width=5)
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width, border_color='blue', border_width=5)
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         
         self.create_new_word_frame()
@@ -86,21 +90,24 @@ class Main(CTk):
     
     
     def addScrollbar(self):
-        self.scrollbar.pack(side=RIGHT)
+        # self.scrollbar.pack(side=RIGHT)
+        self.scrollbar.configure(command=self.scrollcanvas.yview, hover=True)
+        # self.scrollbar.grid(row=0, column=100, rowspan=100)
         self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
     
     
     def removeScrollbar(self):
-        self.scrollbar.pack_forget()
+        # self.scrollbar.pack_forget()
+        # self.scrollbar.grid_forget()
+        self.scrollbar.configure(command=None, hover=False)
     
     
     def create_new_word_frame(self):
         
         self.word_frames.append(WordFrame(container=self.scrollwindow))
         self.word_frames[-1].grid(row=len(self.word_frames), column=1, sticky='n')
-        print('len:', len(self.word_frames))
         
         if hasattr(self, 'scrollwindow'):
             self.scrollwindow.update()
@@ -109,7 +116,7 @@ class Main(CTk):
         if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
             self.addScrollbar()
             print('scrollbar', self.scrollbar.get())
-            self.scrollcanvas.yview_scroll(100, 'pages') # scroll to bottom each time a word is entered
+            # self.scrollcanvas.yview_scroll(100, 'pages') # scroll to bottom each time a word is entered
         
         # dwdd
         global words
@@ -198,6 +205,7 @@ class Main(CTk):
         # print(words)
         self.update()
         
+        #Scroll to bottom of screen
         self.scrollcanvas.yview_moveto(0.9)
     
     def differs_by_one(self, word1, word2):
@@ -216,7 +224,7 @@ class Main(CTk):
         
         start_char = word[0]
         start_index = letter_index[start_char]
-        next_char = chr(ord(start_char)+1)
+        next_char = chr(ord(start_char)+1) #  NB NOTE BUG: KeyError: '{' when word contains 'z'??
         next_char_index = letter_index[next_char]
         # print('start_char:', start_char, 'start_index:', start_index, 'next_char:', next_char, 'next_char_index:', next_char_index)
         
