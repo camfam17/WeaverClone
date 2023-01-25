@@ -1,6 +1,12 @@
 from customtkinter import *
 from LoadGraph import LoadGraph as lg
-#Arch1
+
+
+# TODO: colour letters green in end word frame that are matching in most recent full word
+
+letter_tile_length = 75
+word_frame_width = 4*75 + 8*10 # = 380
+word_frame_height = letter_tile_length + 20 # = 95
 
 words = []
 class WordFrame(CTkFrame):
@@ -17,9 +23,11 @@ class WordFrame(CTkFrame):
         
         self.tiles = []
         for i in range(4):
-            tile = CTkLabel(master=self, text=self.static_word[i], font=font1, bg_color='grey', width=75, height=75)
+            tile = CTkLabel(master=self, text=self.static_word[i], font=font1, bg_color='grey', width=letter_tile_length, height=letter_tile_length)
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
+        
+        self.configure(border_color='purple', border_width=5)
     
     
     def update(self):
@@ -45,10 +53,6 @@ class WordFrame(CTkFrame):
         for tile in self.tiles:
             tile.configure(bg_color='grey')
     
-    
-    def move(self, new_command):
-        self.configure(command=new_command)
-
 
 class Main(CTk):
     
@@ -56,58 +60,98 @@ class Main(CTk):
         super().__init__()
         
         self.title("WeaverClone")
+        # self.geometry('380x600')
+        # self.geometry('420x600')
         self.bind('<Key>', self.key_press)
         
-        #TODO: add scroll frame
-        
         self.start_word_frame = WordFrame(self, static_word=start_word)
-        self.start_word_frame.grid(row=0, column=1)
+        self.start_word_frame.grid(row=0, column=1, padx=10, pady=10, sticky='w')
         self.start_word_frame.colour()
         self.end_word_frame = WordFrame(self, static_word=end_word)
-        self.end_word_frame.grid(row=100, column=1)
+        self.end_word_frame.grid(row=2, column=1, padx=10, pady=10, sticky='w')
         
         
         self.word_frames = []
         
+        
+        self.mainframe = CTkFrame(master=self, border_color='red', border_width=5) #, height=word_frame_height
+        self.mainframe.grid(row=1, column=1)
+        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height, highlightbackground='green', highlightthickness=5)
+        # self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
+        self.scrollcanvas.grid(row=2, column=1)
+        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, fg_color='pink', orientation='vertical', width=18, height=word_frame_height) #, command=self.scrollcanvas.yview
+        self.scrollbar.grid(row=0, column=100, rowspan=100)
+        
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20, border_color='blue', border_width=5)
+        self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
+        
         self.create_new_word_frame()
         
-        
-        
         self.message_label = CTkLabel(master=self, text='', width=100, height=50)
-        self.message_label.grid(row=101, column=1)
+        self.message_label.grid(row=3, column=1)
         
     
     
-    def addScrollbar(self):
+    def activateScrollbar(self):
+        # self.scrollbar.pack(side=RIGHT)
+        self.scrollbar.configure(command=self.scrollcanvas.yview, hover=True)
+        # self.scrollbar.grid(row=0, column=100, rowspan=100)
+        self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
-        self.scrollbar = CTkScrollbar(master=self, width=30, height=300)
-        for frame in self.word_frames:
-            # frame.configure(master=self.scrollbar)
-            # frame.move(self.scrollbar.set)
-            frame.config(command=self.scrollbar.set)
-        
-        self.scrollbar.grid(row=99, column=1)
-
+    
+    
+    def deactivateScrollbar(self):
+        # self.scrollbar.pack_forget()
+        # self.scrollbar.grid_forget()
+        self.scrollbar.configure(command=None, hover=False)
+    
     
     def create_new_word_frame(self):
         
-        self.word_frames.append(WordFrame(self))
-        self.word_frames[-1].grid(row=len(self.word_frames), column=1)
+        self.word_frames.append(WordFrame(container=self.scrollwindow))
+        self.word_frames[-1].grid(row=len(self.word_frames), column=1, padx=10) #, sticky='n'
         
-        # if len(self.word_frames) >= 4:
-        #     self.addScrollbar()
-        # dwdd
+        # if hasattr(self, 'scrollwindow'):
+        self.scrollwindow.update()
+        self.scrollcanvas.update()
+        
+        if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
+            self.activateScrollbar()
+            print('scrollbar', self.scrollbar.get())
+        
+        self.scrollcanvas.configure(height=min(3.5*word_frame_height, self.scrollwindow.winfo_height()))
+        self.scrollbar.configure(height=self.scrollcanvas.winfo_height())
+        
         global words
         words.append('')
+        
     
     
     def delete_last_word_frame(self):
         
-        if len(self.word_frames) > 1:
-            self.word_frames.pop(-1).destroy()
-            words.pop(-1)
-            
-            self.word_frames[-1].uncolour()
+        if len(self.word_frames) <= 1:
+            return
+        
+        # if len(self.word_frames) > 1:
+        self.word_frames.pop(-1).destroy()
+        words.pop(-1)
+        
+        self.word_frames[-1].uncolour()
+        
+        # if hasattr(self, 'scrollwindow'):
+        self.scrollwindow.update() # necesarry for resizing
+        
+        self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
+        
+        if len(self.word_frames) == 3:
+            self.deactivateScrollbar()
+        
+        if len(self.word_frames) < 4:
+            self.scrollcanvas.configure(height=len(self.word_frames)*word_frame_height)
+            self.scrollbar.configure(height=self.scrollwindow.winfo_height())
+            # self.scrollbar.configure(height=self.scrollcanvas.winfo_height())
+
     
     
     def update(self):
@@ -125,7 +169,7 @@ class Main(CTk):
         
         
         if key.char == '\r': #ENTER
-            print(words[-1])
+            # print(words[-1])
             if len(words[-1]) < 4:
                 self.post_message("Not a four letter word")
             else:
@@ -136,7 +180,7 @@ class Main(CTk):
                 elif not self.in_dictionary(words[-1]):
                     self.post_message('Not a word in dictionary')
                 elif words[-1] == end_word:
-                    self.post_message('You Win! Score =' + str(len(self.word_frames)))
+                    self.post_message('You Win! Score = ' + str(len(self.word_frames)))
                     self.word_frames[-1].colour()
                     self.end_word_frame.colour()
                 else:
@@ -153,9 +197,10 @@ class Main(CTk):
             if len(words[-1]) < 4:
                 words[-1] += key.char
             
-        
-        print(words)
         self.update()
+        
+        #Scroll to bottom of screen
+        self.scrollcanvas.yview_moveto(0.9)
     
     def differs_by_one(self, word1, word2):
         
@@ -173,7 +218,7 @@ class Main(CTk):
         
         start_char = word[0]
         start_index = letter_index[start_char]
-        next_char = chr(ord(start_char)+1)
+        next_char = chr(ord(start_char)+1) #  NB NOTE BUG: KeyError: '{' when word contains 'z'??
         next_char_index = letter_index[next_char]
         # print('start_char:', start_char, 'start_index:', start_index, 'next_char:', next_char, 'next_char_index:', next_char_index)
         

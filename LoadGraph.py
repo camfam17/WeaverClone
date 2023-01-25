@@ -44,7 +44,7 @@ class LoadGraph():
         # select a random start word
         while True:
             self.start_node = random.randrange(0, len(self.graph.nodes))
-            
+            # self.start_node = 5
             if len(list(self.graph.neighbors(self.start_node))) > 0:
                 break
             
@@ -60,13 +60,14 @@ class LoadGraph():
         # self.steps_list = self.get_steps_list(n=min_guesses)
         
         
+        ######################### NB: this loop still spins sometimes. Must add fail counter! ###############################
         # USED FOR STRAT 2
         # NB: BUG - this loop just spins if the start word as no neighbours. 
         # first check that the start word has neighbours 
         # and maybe have a failure counter and if the counter goes above a certain threshold then a new start word is chosen
         while True:
             self.end_node = random.randrange(0, len(self.graph.nodes))
-            
+            # self.end_node = 1255
             try:
                 shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
             except nx.exception.NetworkXNoPath:
