@@ -6,6 +6,7 @@ from LoadGraph import LoadGraph as lg
 
 letter_tile_length = 75
 word_frame_width = 4*75 + 8*10 # = 380
+word_frame_height = letter_tile_length + 20 # = 95
 
 words = []
 class WordFrame(CTkFrame):
@@ -73,12 +74,12 @@ class Main(CTk):
         self.word_frames = []
         
         
-        self.mainframe = CTkFrame(master=self, border_color='red', border_width=5)
+        self.mainframe = CTkFrame(master=self, border_color='red', border_width=5) #, height=word_frame_height
         self.mainframe.grid(row=1, column=1)
-        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, highlightbackground='green', highlightthickness=5)
+        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height, highlightbackground='green', highlightthickness=5)
         # self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
         self.scrollcanvas.grid(row=2, column=1)
-        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, fg_color='pink', orientation='vertical', width=18) #, command=self.scrollcanvas.yview
+        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, fg_color='pink', orientation='vertical', width=18, height=word_frame_height) #, command=self.scrollcanvas.yview
         self.scrollbar.grid(row=0, column=100, rowspan=100)
         
         self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20, border_color='blue', border_width=5)
@@ -114,22 +115,15 @@ class Main(CTk):
         if hasattr(self, 'scrollwindow'):
             self.scrollwindow.update()
         
-        
         if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
             self.activateScrollbar()
             print('scrollbar', self.scrollbar.get())
-            # self.scrollcanvas.yview_scroll(100, 'pages') # scroll to bottom each time a word is entered
-        else:
-            self.scrollcanvas.configure(width=self.scrollwindow.winfo_width(), height=self.scrollwindow.winfo_height())
-            print('widthheight:', self.scrollwindow.winfo_width(), self.scrollwindow.winfo_height())
         
+        self.scrollcanvas.configure(height=min(3.5*word_frame_height, self.scrollwindow.winfo_height()))
+        self.scrollbar.configure(height=self.scrollcanvas.winfo_height())
         
         global words
         words.append('')
-        
-        # if len(self.word_frames) <=3:
-            # self.scrollcanvas.configure(width=self.scrollwindow.winfo_width(), height=self.scrollwindow.winfo_height())
-            # print('widthheight:', self.scrollwindow.winfo_width(), self.scrollwindow.winfo_height())
         
     
     
@@ -143,22 +137,17 @@ class Main(CTk):
             
             if hasattr(self, 'scrollwindow'):
                 self.scrollwindow.update() # necesarry for resizing
-                
-            # if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
-                # self.addScrollbar() # calling the bind configure method resizes the canvas
+            
             self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
             
             if len(self.word_frames) == 3:
                 self.deactivateScrollbar()
             
-            # NOTE: this is causing all wordframes to disappear off screen
-            # self.scrollcanvas.yview_scroll(100, 'pages')
-            # self.scrollcanvas.configure(yscrollincrement='1')
-            # self.scrollcanvas.yview_scroll(-95, 'units')
             
-            
-            # if scrollbar not at bottom:
-                # scroll to bottom
+            # self.scrollcanvas.configure(height=max(len(self.word_frames)*word_frame_height, self.scrollwindow.winfo_height()))
+            if len(self.word_frames) < 4:
+                self.scrollcanvas.configure(height=len(self.word_frames)*word_frame_height)
+                self.scrollbar.configure(height=self.scrollwindow.winfo_height())
 
     
     
