@@ -112,8 +112,9 @@ class Main(CTk):
         self.word_frames.append(WordFrame(container=self.scrollwindow))
         self.word_frames[-1].grid(row=len(self.word_frames), column=1, padx=10) #, sticky='n'
         
-        if hasattr(self, 'scrollwindow'):
-            self.scrollwindow.update()
+        # if hasattr(self, 'scrollwindow'):
+        self.scrollwindow.update()
+        self.scrollcanvas.update()
         
         if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
             self.activateScrollbar()
@@ -129,25 +130,27 @@ class Main(CTk):
     
     def delete_last_word_frame(self):
         
-        if len(self.word_frames) > 1:
-            self.word_frames.pop(-1).destroy()
-            words.pop(-1)
-            
-            self.word_frames[-1].uncolour()
-            
-            if hasattr(self, 'scrollwindow'):
-                self.scrollwindow.update() # necesarry for resizing
-            
-            self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
-            
-            if len(self.word_frames) == 3:
-                self.deactivateScrollbar()
-            
-            
-            # self.scrollcanvas.configure(height=max(len(self.word_frames)*word_frame_height, self.scrollwindow.winfo_height()))
-            if len(self.word_frames) < 4:
-                self.scrollcanvas.configure(height=len(self.word_frames)*word_frame_height)
-                self.scrollbar.configure(height=self.scrollwindow.winfo_height())
+        if len(self.word_frames) <= 1:
+            return
+        
+        # if len(self.word_frames) > 1:
+        self.word_frames.pop(-1).destroy()
+        words.pop(-1)
+        
+        self.word_frames[-1].uncolour()
+        
+        # if hasattr(self, 'scrollwindow'):
+        self.scrollwindow.update() # necesarry for resizing
+        
+        self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
+        
+        if len(self.word_frames) == 3:
+            self.deactivateScrollbar()
+        
+        if len(self.word_frames) < 4:
+            self.scrollcanvas.configure(height=len(self.word_frames)*word_frame_height)
+            self.scrollbar.configure(height=self.scrollwindow.winfo_height())
+            # self.scrollbar.configure(height=self.scrollcanvas.winfo_height())
 
     
     
