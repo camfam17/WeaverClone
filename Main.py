@@ -4,11 +4,19 @@ from LoadGraph import LoadGraph as lg
 
 # TODO: colour letters green in end word frame that are matching in most recent full word
 
+# reset button
+# 'view graph' button
+# add ability to scroll with mouse anywhere on screen, not just hovering above the scrollbar (bind mousepress event? & yviewscroll)
+# refactor if statements inside key_press function
+
 letter_tile_length = 75
 word_frame_width = 4*75 + 8*10 # = 380
 word_frame_height = letter_tile_length + 20 # = 95
 
+inbetween_frames = 4 # number of word frames in between start_word_frame and end_word_frame before needing to scroll
+
 words = []
+
 class WordFrame(CTkFrame):
     
     def __init__(self, container, **kwargs):
@@ -27,7 +35,7 @@ class WordFrame(CTkFrame):
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
         
-        self.configure(border_color='purple', border_width=5)
+        # self.configure(border_color='purple', border_width=5)
     
     
     def update(self):
@@ -52,7 +60,7 @@ class WordFrame(CTkFrame):
         
         for tile in self.tiles:
             tile.configure(bg_color='grey')
-    
+
 
 class Main(CTk):
     
@@ -60,8 +68,7 @@ class Main(CTk):
         super().__init__()
         
         self.title("WeaverClone")
-        # self.geometry('380x600')
-        # self.geometry('420x600')
+        self.resizable(False, False)
         self.bind('<Key>', self.key_press)
         
         self.start_word_frame = WordFrame(self, static_word=start_word)
@@ -74,56 +81,51 @@ class Main(CTk):
         self.word_frames = []
         
         
-        self.mainframe = CTkFrame(master=self, border_color='red', border_width=5) #, height=word_frame_height
+        self.mainframe = CTkFrame(master=self) # , border_color='red', border_width=5
         self.mainframe.grid(row=1, column=1)
-        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height, highlightbackground='green', highlightthickness=5)
-        # self.scrollcanvas.pack(expand=True, side=LEFT, ipadx=10, ipady=10)
+        
+        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height) #, highlightbackground='green', highlightthickness=5
         self.scrollcanvas.grid(row=2, column=1)
-        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, fg_color='pink', orientation='vertical', width=18, height=word_frame_height) #, command=self.scrollcanvas.yview
+        
+        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, orientation='vertical', width=18, height=word_frame_height) #, fg_color='pink'
         self.scrollbar.grid(row=0, column=100, rowspan=100)
         
-        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20, border_color='blue', border_width=5)
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20) # , border_color='blue', border_width=5
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         
         self.create_new_word_frame()
         
-        self.message_label = CTkLabel(master=self, text='', width=100, height=50)
+        self.message_label = CTkLabel(master=self, text='', width=word_frame_width, height=50, bg_color='#c5bebe')
         self.message_label.grid(row=3, column=1)
         
     
     
     def activateScrollbar(self):
-        # self.scrollbar.pack(side=RIGHT)
         self.scrollbar.configure(command=self.scrollcanvas.yview, hover=True)
-        # self.scrollbar.grid(row=0, column=100, rowspan=100)
         self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
     
     
     def deactivateScrollbar(self):
-        # self.scrollbar.pack_forget()
-        # self.scrollbar.grid_forget()
         self.scrollbar.configure(command=None, hover=False)
     
     
     def create_new_word_frame(self):
         
         self.word_frames.append(WordFrame(container=self.scrollwindow))
-        self.word_frames[-1].grid(row=len(self.word_frames), column=1, padx=10) #, sticky='n'
+        self.word_frames[-1].grid(row=len(self.word_frames), column=1, padx=10)
         
-        # if hasattr(self, 'scrollwindow'):
         self.scrollwindow.update()
         self.scrollcanvas.update()
         
-        if len(self.word_frames) >= 4: # NOTE: this is executed every time you enter a new word, see if it will only run ones
+        if len(self.word_frames) >= inbetween_frames: # NOTE: this is executed every time you enter a new word, see if it will only run ones
             self.activateScrollbar()
             print('scrollbar', self.scrollbar.get())
         
-        self.scrollcanvas.configure(height=min(3.5*word_frame_height, self.scrollwindow.winfo_height()))
+        self.scrollcanvas.configure(height=min((inbetween_frames-0.5)*word_frame_height, self.scrollwindow.winfo_height()))
         self.scrollbar.configure(height=self.scrollcanvas.winfo_height())
         
-        global words
         words.append('')
         
     
@@ -133,24 +135,21 @@ class Main(CTk):
         if len(self.word_frames) <= 1:
             return
         
-        # if len(self.word_frames) > 1:
         self.word_frames.pop(-1).destroy()
         words.pop(-1)
         
         self.word_frames[-1].uncolour()
         
-        # if hasattr(self, 'scrollwindow'):
         self.scrollwindow.update() # necesarry for resizing
         
         self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
         
-        if len(self.word_frames) == 3:
+        if len(self.word_frames) == inbetween_frames-1:
             self.deactivateScrollbar()
         
-        if len(self.word_frames) < 4:
+        if len(self.word_frames) < inbetween_frames:
             self.scrollcanvas.configure(height=len(self.word_frames)*word_frame_height)
             self.scrollbar.configure(height=self.scrollwindow.winfo_height())
-            # self.scrollbar.configure(height=self.scrollcanvas.winfo_height())
 
     
     
@@ -160,15 +159,16 @@ class Main(CTk):
         
         if len(self.word_frames) > 1:
             self.word_frames[-2].colour()
-        
     
     
     def key_press(self, key):
-        # print('key_press: ', key)
-        global words
+        # print('key_press: ', key, type(key))
+        global words # may not be necessary
         
+        key_char = key.char.lower()
+        key_code = key.keycode
         
-        if key.char == '\r': #ENTER
+        if key_char == '\r': #ENTER
             # print(words[-1])
             if len(words[-1]) < 4:
                 self.post_message("Not a four letter word")
@@ -180,36 +180,36 @@ class Main(CTk):
                 elif not self.in_dictionary(words[-1]):
                     self.post_message('Not a word in dictionary')
                 elif words[-1] == end_word:
-                    self.post_message('You Win! Score = ' + str(len(self.word_frames)))
+                    self.post_message('You Win! Score = ' + str(len(self.word_frames)), 10_000)
                     self.word_frames[-1].colour()
                     self.end_word_frame.colour()
                 else:
                     self.post_message('Next Word')
                     self.create_new_word_frame()
             
-        elif key.keycode == 8: #BACKSPACE
+        elif key_code == 8: #BACKSPACE
             if len(words[-1]) > 0:
                 words[-1] = words[-1][:-1]
             else:
                 self.delete_last_word_frame()
-        elif key.keycode > 64 and key.keycode < 91: #characters a-z
+        elif key_code > 64 and key_code < 91: #characters a-z
             
             if len(words[-1]) < 4:
-                words[-1] += key.char
+                words[-1] += key_char
             
         self.update()
         
         #Scroll to bottom of screen
         self.scrollcanvas.yview_moveto(0.9)
     
+    
     def differs_by_one(self, word1, word2):
-        
         differ = 0
         for i in range(4):
             if not word1[i] == word2[i]:
                 differ += 1
-        
         return differ == 1
+    
     
     # check if word is in dictionary. only searches words in dictionary starting with the same first letter as the submitted word (better efficiency)
     def in_dictionary(self, word):
@@ -218,52 +218,35 @@ class Main(CTk):
         
         start_char = word[0]
         start_index = letter_index[start_char]
-        next_char = chr(ord(start_char)+1) #  NB NOTE BUG: KeyError: '{' when word contains 'z'??
+        next_char = chr(ord(start_char)+1)
         next_char_index = letter_index[next_char]
-        # print('start_char:', start_char, 'start_index:', start_index, 'next_char:', next_char, 'next_char_index:', next_char_index)
         
         return word + "\n" in four_letter_words[start_index:next_char_index]
     
     
     def post_message(self, string, time=5000):
-        
         self.message_label.configure(text=string)
         self.message_label.after(time, lambda: self.message_label.configure(text=''))
-        
-    
+
 
 if __name__ == "__main__":
-    
-    # start_word = 'loop'
-    # end_word = 'stop'
     
     file = open('fourletterwordlist3.txt')
     four_letter_words = file.readlines()
     file.close()
-    
     
     # precompute indices of each letter, allows for faster search later on
     letter_index = {'a' : 0}
     for i in range(1, len(four_letter_words)):
         if four_letter_words[i][0] != four_letter_words[i-1][0]:
             letter_index[four_letter_words[i][0]] = i
-    print(letter_index)
+    letter_index['{'] = len(four_letter_words)
     
     g = lg()
     start_node, end_node, shortest_path, shortest_paths = g.get_new_game()
     
     start_word = four_letter_words[start_node][:-1]
     end_word = four_letter_words[end_node][:-1]
-    
-    # start_word = 'loop'
-    # end_word = 'stop'
-    
-    #TODO: choose start and end words
-    # 1) need an algorithm to find optimal path (graph theory?)
-    # 2) choose two random words and find shortest path between them OR:
-    # 3) chose a start/end word and word your way forwards/backwards to get the end/start word respectively (may be pointless since you need to find optimal path anyway) OR:
-    # 4) select a minimum number of guesses x you want the user to make. select a random start word and traverse their adjacent nodes x times to get x guesses away from the start word
-    # 5) create a visual graph of all the words and their adjacent nodes, show all paths from start word to end word (under certain number of guesses), look for graph visualization packages/modules
     
     main = Main()
     main.mainloop()
