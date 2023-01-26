@@ -77,10 +77,6 @@ class Main(CTk):
         self.end_word_frame = WordFrame(self, static_word=end_word)
         self.end_word_frame.grid(row=2, column=1, padx=10, pady=10, sticky='w')
         
-        
-        self.word_frames = []
-        
-        
         self.mainframe = CTkFrame(master=self) # , border_color='red', border_width=5
         self.mainframe.grid(row=1, column=1)
         
@@ -93,11 +89,11 @@ class Main(CTk):
         self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20) # , border_color='blue', border_width=5
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         
-        self.create_new_word_frame()
-        
         self.message_label = CTkLabel(master=self, text='', width=word_frame_width, height=50, bg_color='#c5bebe')
         self.message_label.grid(row=3, column=1)
         
+        self.word_frames = []
+        self.create_new_word_frame()
     
     
     def activateScrollbar(self):
@@ -127,7 +123,6 @@ class Main(CTk):
         self.scrollbar.configure(height=self.scrollcanvas.winfo_height())
         
         words.append('')
-        
     
     
     def delete_last_word_frame(self):
@@ -154,9 +149,7 @@ class Main(CTk):
     
     
     def update(self):
-        
         self.word_frames[-1].update()
-        
         if len(self.word_frames) > 1:
             self.word_frames[-2].colour()
     
