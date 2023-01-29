@@ -17,6 +17,7 @@ def edit_dictionary(dictionary_name, four_letter_dictionary_name):
     new_dict_file = open(four_letter_dictionary_name, 'w')
     new_dict_file.write(new_dict)
     new_dict_file.close()
+    print('Four letter words saved to', four_letter_dictionary_name)
 
 
 # take a list of four letter words and create a graph adjacency list where the nodes are the words and nodes are adjacent if they have one positional letter different
@@ -34,7 +35,7 @@ def create_adjacency_list(four_letter_dictionary_name, adjacency_list_name):
                 string += str(j) + ', '
             
     
-    print(string)
+    print('stings', string)
     
     output_file = open(adjacency_list_name, 'w')
     output_file.write(string)
@@ -127,3 +128,5 @@ if __name__ == '__main__':
     edit_dictionary(dictionary_name, four_letter_dictionary_name)
     create_adjacency_list(four_letter_dictionary_name, adjacency_list_name)
     create_graph(adjacency_list_name, graph_file_name)
+    
+    print('Done')

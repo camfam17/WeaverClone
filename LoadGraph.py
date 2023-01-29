@@ -29,16 +29,6 @@ class LoadGraph():
         pass
     
     
-    def choose_start_node(self):
-        while True:
-            start_node = random.randrange(0, len(self.graph.nodes))
-            # self.start_node = 5
-            if len(list(self.graph.neighbors(start_node))) > 0:
-                print('start node:', start_node, ':', self.node_labels[start_node])
-                return start_node
-        pass
-    
-    
     def get_new_game(self):
         
         ############ read in graph from file ############
@@ -56,12 +46,6 @@ class LoadGraph():
         
         
         ############ select a random start word ############
-        # while True:
-        #     self.start_node = random.randrange(0, len(self.graph.nodes))
-        #     # self.start_node = 5
-        #     if len(list(self.graph.neighbors(self.start_node))) > 0:
-        #         break
-        # print('start node:', self.start_node, ':', self.node_labels[self.start_node])
         self.start_node = self.choose_start_node()
         
         ######################### NB: this loop still spins sometimes. Must add fail counter! ###############################
@@ -90,12 +74,13 @@ class LoadGraph():
         print('shortest_paths', shortest_paths)
         # print('all_paths:', all_paths)
         
-        shortest_graph = nx.Graph()
-        shortest_graph.add_node(self.start_node, label=self.node_labels[self.start_node])
-        for i in range(1, len(shortest_path)):
-            shortest_graph.add_node(shortest_path[i], label=self.node_labels[shortest_path[i]])
-            shortest_graph.add_edge(shortest_path[i-1], shortest_path[i])
-        nx.write_gexf(shortest_graph, 'DataFiles/shortest_graph.gexf')
+        ############ create graph and save as file ############
+        # shortest_graph = nx.Graph()
+        # shortest_graph.add_node(self.start_node, label=self.node_labels[self.start_node])
+        # for i in range(1, len(shortest_path)):
+        #     shortest_graph.add_node(shortest_path[i], label=self.node_labels[shortest_path[i]])
+        #     shortest_graph.add_edge(shortest_path[i-1], shortest_path[i])
+        # nx.write_gexf(shortest_graph, 'DataFiles/shortest_graph.gexf')
         
         shortest_graphs = nx.Graph()
         # TODO: write shortest_paths to a graph, with different path's edges in different colours?
@@ -112,6 +97,30 @@ class LoadGraph():
         return self.start_node, self.end_node, shortest_path, shortest_paths
     
     
+    def load_indices(self):
+        
+        file = open('DataFiles/fourletterwordlist.txt')
+        four_letter_words = file.readlines()
+        file.close()
+        
+        letter_index = {'a' : 0}
+        for i in range(1, len(four_letter_words)):
+            if four_letter_words[i][0] != four_letter_words[i-1][0]:
+                letter_index[four_letter_words[i][0]] = i
+        letter_index['{'] = len(four_letter_words)
+        
+        return letter_index
+    
+    
+    def choose_start_node(self):
+        while True:
+            start_node = random.randrange(0, len(self.graph.nodes))
+            # self.start_node = 5
+            if len(list(self.graph.neighbors(start_node))) > 0:
+                print('start node:', start_node, ':', self.node_labels[start_node])
+                return start_node
+    
+    
     def differs_by_one(self, word1, word2):
         
         differ = 0
@@ -126,8 +135,6 @@ if __name__ == '__main__':
     
     lg = LoadGraph()
     lg.get_new_game()
-    
-    # move all graph and dictionary editing into one file with multiple classes
 
 
 

@@ -98,10 +98,6 @@ class Main(CTk):
         self.create_new_word_frame()
     
     
-    def end_game(self):
-        self.is_game_over = True
-    
-    
     def restart(self):
         
         print('restart')
@@ -182,6 +178,10 @@ class Main(CTk):
         if len(self.word_frames) < inbetween_frames:
             self.scrollcanvas.configure(height=len(self.word_frames)*word_frame_height)
             self.scrollbar.configure(height=self.scrollwindow.winfo_height())
+    
+    
+    def end_game(self):
+        self.is_game_over = True
     
     
     def update(self):
@@ -276,14 +276,18 @@ if __name__ == "__main__":
     four_letter_words = file.readlines()
     file.close()
     
-    # precompute indices of each letter, allows for faster search later on (probably insignificant performance boost)
-    letter_index = {'a' : 0}
-    for i in range(1, len(four_letter_words)):
-        if four_letter_words[i][0] != four_letter_words[i-1][0]:
-            letter_index[four_letter_words[i][0]] = i
-    letter_index['{'] = len(four_letter_words)
+    ######### precompute indices of each letter, allows for faster search later on (probably insignificant performance boost)
+    
+    # letter_index = {'a' : 0}
+    # for i in range(1, len(four_letter_words)):
+    #     if four_letter_words[i][0] != four_letter_words[i-1][0]:
+    #         letter_index[four_letter_words[i][0]] = i
+    # letter_index['{'] = len(four_letter_words)
     
     g = lg()
+    
+    letter_index = g.load_indices()
+    
     start_node, end_node, shortest_path, shortest_paths = g.get_new_game()
     
     start_word = four_letter_words[start_node][:-1]
