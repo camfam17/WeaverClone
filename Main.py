@@ -1,11 +1,7 @@
 from customtkinter import *
 from LoadGraph import LoadGraph as lg
-import math
 
-
-# TODO: colour letters green in end word frame that are matching in most recent full word
-
-# reset button
+# reset button - DONE NEEDS TESTING
 # 'view graph' button
 # refactor if statements inside key_press function
 
@@ -80,16 +76,16 @@ class Main(CTk):
         self.end_word_frame = WordFrame(self, static_word=end_word)
         self.end_word_frame.grid(row=2, column=1, padx=10, pady=10, sticky='w')
         
-        self.mainframe = CTkFrame(master=self, border_color='red', border_width=5) # , border_color='red', border_width=5
+        self.mainframe = CTkFrame(master=self) # , border_color='red', border_width=5
         self.mainframe.grid(row=1, column=1)
         
-        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height, highlightbackground='green', highlightthickness=5) #, highlightbackground='green', highlightthickness=5
+        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height) #, highlightbackground='green', highlightthickness=5
         self.scrollcanvas.grid(row=2, column=1)
         
-        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, orientation='vertical', width=18, height=word_frame_height, fg_color='pink') #, fg_color='pink'
+        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, orientation='vertical', width=18, height=word_frame_height) #, fg_color='pink'
         self.scrollbar.grid(row=0, column=100, rowspan=100)
         
-        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20, border_color='blue', border_width=5) # , border_color='blue', border_width=5
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20) # , border_color='blue', border_width=5
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         
         self.message_label = CTkLabel(master=self, text='', width=word_frame_width, height=50, bg_color='#c5bebe')
@@ -128,33 +124,13 @@ class Main(CTk):
         self.word_frames = []
         self.create_new_word_frame()
         
-        
-        # resize scrollcanvas and scroll to top
-        # self.scrollbar.configure(height=word_frame_height)
-        print('000000000')
         self.scrollcanvas.configure(height=word_frame_height)
-        # disable scrollbar
-        # self.deactivateScrollbar()
-        print('11111111')
-        # self.scrollbar.grid_forget()
-        print('222222222')
-        # self.scrollbar.destroy()
-        print('33333333')
-        # self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, orientation='vertical', width=18, height=word_frame_height, fg_color='pink') #, fg_color='pink'
         self.scrollbar.configure(height=word_frame_height)
         self.activateScrollbar()
-        print('44444444')
-        # self.scrollbar.grid(row=0, column=100, rowspan=100)
-        print('555555555')
         self.scrollcanvas.yview_scroll(100, 'pages')
-        print('6666666666')
-        
-        # self.restart_button.destroy()
-        print('777777777')
+        #self.deactivateScrollbar?
         
         self.is_game_over = False
-        
-        pass
     
     
     def activateScrollbar(self):
