@@ -1,12 +1,12 @@
 from customtkinter import *
 from LoadGraph import LoadGraph as lg
+import math
 
 
 # TODO: colour letters green in end word frame that are matching in most recent full word
 
 # reset button
 # 'view graph' button
-# add ability to scroll with mouse anywhere on screen, not just hovering above the scrollbar (bind mousepress event? & yviewscroll)
 # refactor if statements inside key_press function
 
 letter_tile_length = 75
@@ -70,6 +70,9 @@ class Main(CTk):
         self.title("WeaverClone")
         self.resizable(False, False)
         self.bind('<Key>', self.key_press)
+        self.bind('<MouseWheel>', self.mouse_wheel)
+        
+        self.is_game_over = False
         
         self.start_word_frame = WordFrame(self, static_word=start_word)
         self.start_word_frame.grid(row=0, column=1, padx=10, pady=10, sticky='w')
@@ -77,23 +80,81 @@ class Main(CTk):
         self.end_word_frame = WordFrame(self, static_word=end_word)
         self.end_word_frame.grid(row=2, column=1, padx=10, pady=10, sticky='w')
         
-        self.mainframe = CTkFrame(master=self) # , border_color='red', border_width=5
+        self.mainframe = CTkFrame(master=self, border_color='red', border_width=5) # , border_color='red', border_width=5
         self.mainframe.grid(row=1, column=1)
         
-        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height) #, highlightbackground='green', highlightthickness=5
+        self.scrollcanvas = CTkCanvas(master=self.mainframe, width=word_frame_width, height=word_frame_height, highlightbackground='green', highlightthickness=5) #, highlightbackground='green', highlightthickness=5
         self.scrollcanvas.grid(row=2, column=1)
         
-        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, orientation='vertical', width=18, height=word_frame_height) #, fg_color='pink'
+        self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, orientation='vertical', width=18, height=word_frame_height, fg_color='pink') #, fg_color='pink'
         self.scrollbar.grid(row=0, column=100, rowspan=100)
         
-        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20) # , border_color='blue', border_width=5
+        self.scrollwindow = CTkFrame(master=self.scrollcanvas, width=word_frame_width+20, border_color='blue', border_width=5) # , border_color='blue', border_width=5
         self.scrollcanvas.create_window((0, 0), window=self.scrollwindow, anchor='nw')
         
         self.message_label = CTkLabel(master=self, text='', width=word_frame_width, height=50, bg_color='#c5bebe')
         self.message_label.grid(row=3, column=1)
         
+        self.restart_button = CTkButton(master=self, text='Restart', command=self.restart)
+        self.restart_button.grid(row=4, column=1)
+        
         self.word_frames = []
         self.create_new_word_frame()
+    
+    
+    def end_game(self):
+        self.is_game_over = True
+    
+    
+    def restart(self):
+        
+        print('restart')
+        global words, start_word, end_word
+        words = []
+        
+        start_node, end_node, shortest_path, shortest_paths = g.get_new_game()
+        start_word = four_letter_words[start_node][:-1]
+        end_word = four_letter_words[end_node][:-1]
+        
+        self.start_word_frame = WordFrame(self, static_word=start_word)
+        self.start_word_frame.grid(row=0, column=1, padx=10, pady=10, sticky='w')
+        self.start_word_frame.colour()
+        self.end_word_frame = WordFrame(self, static_word=end_word)
+        self.end_word_frame.grid(row=2, column=1, padx=10, pady=10, sticky='w')
+        
+        
+        for word_frame in self.word_frames:
+            word_frame.destroy()
+        self.word_frames = []
+        self.create_new_word_frame()
+        
+        
+        # resize scrollcanvas and scroll to top
+        # self.scrollbar.configure(height=word_frame_height)
+        print('000000000')
+        self.scrollcanvas.configure(height=word_frame_height)
+        # disable scrollbar
+        # self.deactivateScrollbar()
+        print('11111111')
+        # self.scrollbar.grid_forget()
+        print('222222222')
+        # self.scrollbar.destroy()
+        print('33333333')
+        # self.scrollbar = CTkScrollbar(master=self.mainframe, hover=False, orientation='vertical', width=18, height=word_frame_height, fg_color='pink') #, fg_color='pink'
+        self.scrollbar.configure(height=word_frame_height)
+        self.activateScrollbar()
+        print('44444444')
+        # self.scrollbar.grid(row=0, column=100, rowspan=100)
+        print('555555555')
+        self.scrollcanvas.yview_scroll(100, 'pages')
+        print('6666666666')
+        
+        # self.restart_button.destroy()
+        print('777777777')
+        
+        self.is_game_over = False
+        
+        pass
     
     
     def activateScrollbar(self):
@@ -145,7 +206,6 @@ class Main(CTk):
         if len(self.word_frames) < inbetween_frames:
             self.scrollcanvas.configure(height=len(self.word_frames)*word_frame_height)
             self.scrollbar.configure(height=self.scrollwindow.winfo_height())
-
     
     
     def update(self):
@@ -161,8 +221,12 @@ class Main(CTk):
         key_char = key.char.lower()
         key_code = key.keycode
         
+        if(self.is_game_over):
+            self.restart()
+            return
+        
         if key_char == '\r': #ENTER
-            # print(words[-1])
+            print(words)
             if len(words[-1]) < 4:
                 self.post_message("Not a four letter word")
             else:
@@ -176,6 +240,7 @@ class Main(CTk):
                     self.post_message('You Win! Score = ' + str(len(self.word_frames)), 10_000)
                     self.word_frames[-1].colour()
                     self.end_word_frame.colour()
+                    self.end_game()
                 else:
                     self.post_message('Next Word')
                     self.create_new_word_frame()
@@ -194,6 +259,11 @@ class Main(CTk):
         
         #Scroll to bottom of screen
         self.scrollcanvas.yview_moveto(0.9)
+    
+    
+    def mouse_wheel(self, event):
+        if len(self.word_frames) >= inbetween_frames:
+            self.scrollcanvas.yview_scroll(-int(event.delta/abs(event.delta)), 'units')
     
     
     def differs_by_one(self, word1, word2):

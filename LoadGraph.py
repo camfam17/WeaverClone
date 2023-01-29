@@ -1,6 +1,10 @@
 import networkx as nx
 import random
 
+
+# add ability to choose start word and/or end word
+
+
 class LoadGraph():
     
     # STRAT 1
