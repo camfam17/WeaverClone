@@ -127,5 +127,3 @@ if __name__ == '__main__':
     edit_dictionary(dictionary_name, four_letter_dictionary_name)
     create_adjacency_list(four_letter_dictionary_name, adjacency_list_name)
     create_graph(adjacency_list_name, graph_file_name)
-    
-    pass

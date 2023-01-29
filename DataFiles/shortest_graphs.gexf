@@ -5,32 +5,24 @@
   </meta>
   <graph defaultedgetype="undirected" mode="static" name="">
     <nodes>
-      <node id="344" label="coat" />
-      <node id="201" label="boat" />
-      <node id="151" label="beat" />
-      <node id="148" label="beam" />
-      <node id="1967" label="team" />
-      <node id="1974" label="teem" />
-      <node id="1970" label="teat" />
-      <node id="314" label="chat" />
-      <node id="1987" label="that" />
-      <node id="1291" label="moat" />
-      <node id="1253" label="meat" />
+      <node id="1562" label="prep" />
+      <node id="1477" label="peep" />
+      <node id="157" label="beep" />
+      <node id="159" label="bees" />
+      <node id="154" label="beds" />
+      <node id="175" label="bids" />
+      <node id="1650" label="rids" />
+      <node id="1631" label="reds" />
     </nodes>
     <edges>
-      <edge source="344" target="201" id="0" />
-      <edge source="344" target="314" id="1" />
-      <edge source="344" target="1291" id="2" />
-      <edge source="201" target="151" id="3" />
-      <edge source="151" target="148" id="4" />
-      <edge source="151" target="1970" id="5" />
-      <edge source="148" target="1967" id="6" />
-      <edge source="1967" target="1974" id="7" />
-      <edge source="1967" target="1970" id="8" />
-      <edge source="1970" target="1987" id="9" />
-      <edge source="1970" target="1253" id="10" />
-      <edge source="314" target="1987" id="11" />
-      <edge source="1291" target="1253" id="12" />
+      <edge source="1562" target="1477" id="0" />
+      <edge source="1477" target="157" id="1" />
+      <edge source="157" target="159" id="2" />
+      <edge source="159" target="154" id="3" />
+      <edge source="154" target="175" id="4" />
+      <edge source="154" target="1631" id="5" />
+      <edge source="175" target="1650" id="6" />
+      <edge source="1650" target="1631" id="7" />
     </edges>
   </graph>
 </gexf>
