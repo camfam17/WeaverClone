@@ -64,6 +64,9 @@ if __name__ == '__main__':
     
     adj_dict = create_adjacency_dictionary(adj_list)
     print(adj_dict)
+    
+    print('size:', size, 'len(adj_list):', len(adj_list), 'len(adj_dict):', len(adj_dict))
+    
     # graph_name = os.getcwd() + '\\graphs\\graph15.html'
     
     
