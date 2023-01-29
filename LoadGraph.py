@@ -42,7 +42,7 @@ class LoadGraph():
     def get_new_game(self):
         
         ############ read in graph from file ############
-        self.graph = nx.read_gexf('network file.gexf', node_type=int)
+        self.graph = nx.read_gexf('DataFiles/network file.gexf', node_type=int)
         print('Graph info:', nx.number_of_nodes(self.graph), 'nodes,', nx.number_of_edges(self.graph), 'edges')
         
         
@@ -95,7 +95,7 @@ class LoadGraph():
         for i in range(1, len(shortest_path)):
             shortest_graph.add_node(shortest_path[i], label=self.node_labels[shortest_path[i]])
             shortest_graph.add_edge(shortest_path[i-1], shortest_path[i])
-        nx.write_gexf(shortest_graph, 'shortest_graph.gexf')
+        nx.write_gexf(shortest_graph, 'DataFiles/shortest_graph.gexf')
         
         shortest_graphs = nx.Graph()
         # TODO: write shortest_paths to a graph, with different path's edges in different colours?
@@ -106,7 +106,7 @@ class LoadGraph():
                 shortest_graphs.add_node(shortest_paths[i][j], label=self.node_labels[shortest_paths[i][j]])
                 # shortest_graphs.add_node(j, label=self.node_labels[j])
                 shortest_graphs.add_edge(shortest_paths[i][j-1], shortest_paths[i][j])
-        nx.write_gexf(shortest_graphs, 'shortest_graphs.gexf')
+        nx.write_gexf(shortest_graphs, 'DataFiles/shortest_graphs.gexf')
         
         print('Done')
         return self.start_node, self.end_node, shortest_path, shortest_paths

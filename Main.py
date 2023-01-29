@@ -270,11 +270,13 @@ class Main(CTk):
 
 if __name__ == "__main__":
     
-    file = open('fourletterwordlist3.txt')
+    
+    #### Move this precompute section to LoadGraph.py??
+    file = open('DataFiles/fourletterwordlist.txt')
     four_letter_words = file.readlines()
     file.close()
     
-    # precompute indices of each letter, allows for faster search later on
+    # precompute indices of each letter, allows for faster search later on (probably insignificant performance boost)
     letter_index = {'a' : 0}
     for i in range(1, len(four_letter_words)):
         if four_letter_words[i][0] != four_letter_words[i-1][0]:

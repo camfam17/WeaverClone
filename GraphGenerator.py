@@ -118,10 +118,10 @@ def differs_by_one(word1, word2):
 
 if __name__ == '__main__':
     
-    dictionary_name = 'wordlist.txt'
-    four_letter_dictionary_name = 'fourletterwordlist.txt'
-    adjacency_list_name = 'AdjacencyList.txt'
-    graph_file_name = 'network 2294 words.gexf'
+    dictionary_name = 'DataFiles/wordlist.txt'
+    four_letter_dictionary_name = 'DataFiles/fourletterwordlist.txt'
+    adjacency_list_name = 'DataFiles/AdjacencyList.txt'
+    graph_file_name = 'DataFiles/network file.gexf'
     
     
     edit_dictionary(dictionary_name, four_letter_dictionary_name)
