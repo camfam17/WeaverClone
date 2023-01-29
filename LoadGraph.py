@@ -42,7 +42,7 @@ class LoadGraph():
     def get_new_game(self):
         
         ############ read in graph from file ############
-        self.graph = nx.read_gexf('network3 2294 words.gexf', node_type=int)
+        self.graph = nx.read_gexf('network file.gexf', node_type=int)
         print('Graph info:', nx.number_of_nodes(self.graph), 'nodes,', nx.number_of_edges(self.graph), 'edges')
         
         

@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 nxnet = nx.Graph()
 
 # take a dictionary of words and create a textfile of all the words contianing four letters
-def edit_dictionary():
-    dict_file = open('wordlist3.txt')
+def edit_dictionary(dictionary_name, four_letter_dictionary_name):
+    dict_file = open(dictionary_name)
     lines = dict_file.readlines()
     dict_file.close()
     
@@ -14,14 +14,14 @@ def edit_dictionary():
         if(len(word) == 5 and word[-1] == '\n'):
             new_dict += word
     
-    new_dict_file = open('fourletterwordlist3.txt', 'w')
+    new_dict_file = open(four_letter_dictionary_name, 'w')
     new_dict_file.write(new_dict)
     new_dict_file.close()
 
 
 # take a list of four letter words and create a graph adjacency list where the nodes are the words and nodes are adjacent if they have one positional letter different
-def create_adjacency_list():
-    four_letter_words = open('fourletterwordlist3.txt').readlines()
+def create_adjacency_list(four_letter_dictionary_name, adjacency_list_name):
+    four_letter_words = open(four_letter_dictionary_name).readlines()
     
     string = ''
     
@@ -36,13 +36,13 @@ def create_adjacency_list():
     
     print(string)
     
-    output_file = open('AdjacencyList3.txt', 'w')
+    output_file = open(adjacency_list_name, 'w')
     output_file.write(string)
 
 
 # create a graph file of type .gexf
-def create_graph():
-    adj_list = load_adjacency_list('AdjacencyList3.txt')
+def create_graph(adjacency_list_name, graph_file_name):
+    adj_list = load_adjacency_list(adjacency_list_name)
     
     size = len(adj_list)
     # size = 300
@@ -55,7 +55,7 @@ def create_graph():
     
     create_nx_graph(adj_dict)
     
-    nx.write_gexf(nxnet, 'network3 2294 words.gexf')
+    nx.write_gexf(nxnet, graph_file_name)
 
 
 # read in adjacency list file
@@ -118,6 +118,14 @@ def differs_by_one(word1, word2):
 
 if __name__ == '__main__':
     
+    dictionary_name = 'wordlist.txt'
+    four_letter_dictionary_name = 'fourletterwordlist.txt'
+    adjacency_list_name = 'AdjacencyList.txt'
+    graph_file_name = 'network 2294 words.gexf'
     
+    
+    edit_dictionary(dictionary_name, four_letter_dictionary_name)
+    create_adjacency_list(four_letter_dictionary_name, adjacency_list_name)
+    create_graph(adjacency_list_name, graph_file_name)
     
     pass
