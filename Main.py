@@ -1,5 +1,5 @@
 from customtkinter import *
-from LoadGraph import LoadGraph as lg
+from LoadGraph import LoadGraph
 
 # reset button - DONE NEEDS TESTING
 # 'view graph' button
@@ -94,8 +94,15 @@ class Main(CTk):
         self.restart_button = CTkButton(master=self, text='Restart', command=self.restart)
         self.restart_button.grid(row=4, column=1)
         
+        self.graph_button = CTkButton(master=self, text='View Graph', command=self.view_graph)
+        self.graph_button.grid(row=5, column=1)
+        
         self.word_frames = []
         self.create_new_word_frame()
+    
+    
+    def view_graph(self):
+        g.view_graph()
     
     
     def restart(self):
@@ -284,7 +291,7 @@ if __name__ == "__main__":
     #         letter_index[four_letter_words[i][0]] = i
     # letter_index['{'] = len(four_letter_words)
     
-    g = lg()
+    g = LoadGraph()
     
     letter_index = g.load_indices()
     

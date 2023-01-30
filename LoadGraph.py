@@ -1,5 +1,6 @@
 import networkx as nx
 import random
+from pyvis.network import Network
 
 
 # add ability to choose start word and/or end word
@@ -115,7 +116,6 @@ class LoadGraph():
     def choose_start_node(self):
         while True:
             start_node = random.randrange(0, len(self.graph.nodes))
-            # self.start_node = 5
             if len(list(self.graph.neighbors(start_node))) > 0:
                 print('start node:', start_node, ':', self.node_labels[start_node])
                 return start_node
@@ -129,6 +129,34 @@ class LoadGraph():
                 differ += 1
         
         return differ == 1
+    
+    
+    def view_graph(self):
+        
+        print('view_graph')
+        
+        graph = nx.read_gexf('DataFiles/shortest_graphs.gexf')
+        
+        net = Network()
+        net.from_nx(graph)
+        
+        
+        
+        
+        start = net.get_node(str(self.start_node))
+        end = net.get_node(str(self.end_node))
+        net.get_node(str(self.start_node))['color'] = '#00FF00'
+        net.get_node(str(self.end_node))['color'] = '#FF0000'
+        print('start:', start, 'end:', end)
+        
+        
+        print(net.get_network_data())
+        
+        # get end node
+        # get end node neighbours
+        # add edges from neighbours to end node or vice versa
+        
+        net.save_graph('/net.html')
 
 
 if __name__ == '__main__':
