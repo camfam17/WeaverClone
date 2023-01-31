@@ -30,30 +30,24 @@ class WordFrame(CTkFrame):
             tile = CTkLabel(master=self, text=self.static_word[i], font=font1, bg_color='grey', width=letter_tile_length, height=letter_tile_length)
             self.tiles.append(tile)
             self.tiles[-1].grid(row=1, column=i*50, padx=10, pady=10)
-        
-        # self.configure(border_color='purple', border_width=5)
     
     
     def update(self):
-        
         for i in range(4):
             if i < len(words[-1]):
                 self.tiles[i].configure(text=words[-1][i])
             else:
                 self.tiles[i].configure(text=' ')
-        
         self.static_word = words[-1]
     
     
     def colour(self):
-        
         for i in range(4):
             if self.static_word[i] == end_word[i]:
                 self.tiles[i].configure(bg_color='green')
     
     
     def uncolour(self):
-        
         for tile in self.tiles:
             tile.configure(bg_color='grey')
 
@@ -121,7 +115,6 @@ class Main(CTk):
         self.end_word_frame = WordFrame(self, static_word=end_word)
         self.end_word_frame.grid(row=2, column=1, padx=10, pady=10, sticky='w')
         
-        
         for word_frame in self.word_frames:
             word_frame.destroy()
         self.word_frames = []
@@ -140,7 +133,6 @@ class Main(CTk):
         self.scrollbar.configure(command=self.scrollcanvas.yview, hover=True)
         self.scrollcanvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollcanvas.bind('<Configure>', self.scrollcanvas.configure(scrollregion=self.scrollcanvas.bbox('all')))
-        
     
     
     def deactivateScrollbar(self):
