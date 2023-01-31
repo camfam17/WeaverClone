@@ -1,6 +1,8 @@
 import networkx as nx
 import random
 from pyvis.network import Network
+from pyvis.options import EdgeOptions
+import webbrowser
 
 
 # add ability to choose start word and/or end word
@@ -58,16 +60,22 @@ class LoadGraph():
         while True:                                                               # NB: BUG - this loop just spins if the start word as no neighbours. 
             fail_count += 1
             self.end_node = random.randrange(0, len(self.graph.nodes))
-            # self.end_node = 1255
+            
             try:
                 shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
             except nx.exception.NetworkXNoPath:
                 continue
             
+            print('fail count:', fail_count, 'end_word', self.nodes[self.end_node]['label'])
+            if(fail_count > 100):
+                self.start_node = self.choose_start_node()
+                fail_count = -1
+                continue
+            
             if self.end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
                 break
         print('end node:', self.end_node, ':', self.node_labels[self.end_node])
-        print('fail count:', fail_count)
+        # print('fail count:', fail_count)
         shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
         # all_paths = nx.all_simple_paths(G=self.graph, source=self.start_node, target=self.end_node, cutoff=6)
         
@@ -116,7 +124,7 @@ class LoadGraph():
     def choose_start_node(self):
         while True:
             start_node = random.randrange(0, len(self.graph.nodes))
-            if len(list(self.graph.neighbors(start_node))) > 0:
+            if len(list(self.graph.neighbors(start_node))) > 0: # checking is the word has at least one neighbour - maybe check how many neighbours it has or how many levels of neighbours it has (how many neighbours does its neighbours have?)
                 print('start node:', start_node, ':', self.node_labels[start_node])
                 return start_node
     
@@ -137,26 +145,32 @@ class LoadGraph():
         
         graph = nx.read_gexf('DataFiles/shortest_graphs.gexf')
         
-        net = Network()
+        net = Network(heading='Weaver Words')
+        net.inherit_edge_colors(False)
         net.from_nx(graph)
         
         
-        
+        net.get_node(str(self.start_node))['color'] = '#00FF00'
+        net.get_node(str(self.start_node))['shape'] = 'star'
+        net.get_node(str(self.end_node))['color'] = '#FF0000'
+        net.get_node(str(self.end_node))['shape'] = 'square'
         
         start = net.get_node(str(self.start_node))
         end = net.get_node(str(self.end_node))
-        net.get_node(str(self.start_node))['color'] = '#00FF00'
-        net.get_node(str(self.end_node))['color'] = '#FF0000'
         print('start:', start, 'end:', end)
+        
         
         
         print(net.get_network_data())
         
-        # get end node
-        # get end node neighbours
-        # add edges from neighbours to end node or vice versa
-        
-        net.save_graph('/net.html')
+        # net.save_graph('DataFiles/net.html')
+        # net.write_html('net.html')
+        # net.show('net.html')
+        gen = net.generate_html('net.html')
+        output = open('net.html', 'w')
+        output.write(gen)
+        output.close()
+        webbrowser.open_new_tab('net.html')
 
 
 if __name__ == '__main__':

@@ -92,10 +92,10 @@ class Main(CTk):
         self.message_label.grid(row=3, column=1)
         
         self.restart_button = CTkButton(master=self, text='Restart', command=self.restart)
-        self.restart_button.grid(row=4, column=1)
+        self.restart_button.grid(row=4, column=1, pady=5)
         
         self.graph_button = CTkButton(master=self, text='View Graph', command=self.view_graph)
-        self.graph_button.grid(row=5, column=1)
+        self.graph_button.grid(row=5, column=1, pady=5)
         
         self.word_frames = []
         self.create_new_word_frame()
