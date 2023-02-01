@@ -56,54 +56,79 @@ class LoadGraph():
         # and maybe have a failure counter and if the counter goes above a certain threshold then a new start word is chosen
         
         ############ find end word and path from start to end ############
+        # fail_count = -1
+        # while True:                      # NB: check that fail counter fixes infinite looping bug
+        #     fail_count += 1
+        #     self.end_node = random.randrange(0, len(self.graph.nodes))
+            
+        #     try:
+        #         shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
+        #     except nx.exception.NetworkXNoPath:
+        #         continue
+            
+        #     print('fail count:', fail_count, 'end_word', self.nodes[self.end_node]['label'])
+        #     if(fail_count > 100):
+        #         self.start_node = self.choose_start_node()
+        #         fail_count = -1
+        #         continue
+            
+        #     if self.end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
+        #         break
+        # print('end node:', self.end_node, ':', self.node_labels[self.end_node])
+        
+        self.end_node = self.select_valid_end_node()
+        shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
+        # all_paths = nx.all_simple_paths(G=self.graph, source=self.start_node, target=self.end_node, cutoff=6)
+        
+        # print('shortest_path', shortest_path)
+        print('shortest_paths', shortest_paths)
+        # print('all_paths:', all_paths)
+        
+        shortest_graphs = self.make_graph_from_list(shortest_paths)
+        nx.write_gexf(shortest_graphs, 'DataFiles/shortest_graphs.gexf')
+        
+        print('Done')
+        return self.start_node, self.end_node, shortest_paths
+    
+    
+    def select_valid_end_node(self):
+        
         fail_count = -1
-        while True:                                                               # NB: BUG - this loop just spins if the start word as no neighbours. 
+        while True:                      # NB: check that fail counter fixes infinite looping bug
             fail_count += 1
-            self.end_node = random.randrange(0, len(self.graph.nodes))
+            end_node = random.randrange(0, len(self.graph.nodes))
             
             try:
-                shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
+                shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=end_node)
             except nx.exception.NetworkXNoPath:
                 continue
             
-            print('fail count:', fail_count, 'end_word', self.nodes[self.end_node]['label'])
+            print('fail count:', fail_count, 'end_word', self.nodes[end_node]['label'])
             if(fail_count > 100):
                 self.start_node = self.choose_start_node()
                 fail_count = -1
                 continue
             
-            if self.end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
+            if end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
                 break
-        print('end node:', self.end_node, ':', self.node_labels[self.end_node])
-        # print('fail count:', fail_count)
-        shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
-        # all_paths = nx.all_simple_paths(G=self.graph, source=self.start_node, target=self.end_node, cutoff=6)
+        print('end node:', end_node, ':', self.node_labels[end_node])
         
-        print('shortest_path', shortest_path)
-        print('shortest_paths', shortest_paths)
-        # print('all_paths:', all_paths)
-        
-        ############ create graph and save as file ############
-        # shortest_graph = nx.Graph()
-        # shortest_graph.add_node(self.start_node, label=self.node_labels[self.start_node])
-        # for i in range(1, len(shortest_path)):
-        #     shortest_graph.add_node(shortest_path[i], label=self.node_labels[shortest_path[i]])
-        #     shortest_graph.add_edge(shortest_path[i-1], shortest_path[i])
-        # nx.write_gexf(shortest_graph, 'DataFiles/shortest_graph.gexf')
+        return end_node
+    
+    
+    def make_graph_from_list(self, path_list):
         
         shortest_graphs = nx.Graph()
         # TODO: write shortest_paths to a graph, with different path's edges in different colours?
-        for i in range(len(shortest_paths)):
-            shortest_graphs.add_node(shortest_paths[i][0], label=self.node_labels[shortest_paths[i][0]])
-            for j in range(1, len(shortest_paths[i])):
+        for i in range(len(path_list)):
+            shortest_graphs.add_node(path_list[i][0], label=self.node_labels[path_list[i][0]])
+            for j in range(1, len(path_list[i])):
                 
-                shortest_graphs.add_node(shortest_paths[i][j], label=self.node_labels[shortest_paths[i][j]])
+                shortest_graphs.add_node(path_list[i][j], label=self.node_labels[path_list[i][j]])
                 # shortest_graphs.add_node(j, label=self.node_labels[j])
-                shortest_graphs.add_edge(shortest_paths[i][j-1], shortest_paths[i][j])
-        nx.write_gexf(shortest_graphs, 'DataFiles/shortest_graphs.gexf')
+                shortest_graphs.add_edge(path_list[i][j-1], path_list[i][j])
         
-        print('Done')
-        return self.start_node, self.end_node, shortest_path, shortest_paths
+        return shortest_graphs
     
     
     def load_indices(self):
@@ -143,11 +168,11 @@ class LoadGraph():
         
         print('view_graph')
         
-        graph = nx.read_gexf('DataFiles/shortest_graphs.gexf')
+        nx_graph = nx.read_gexf('DataFiles/shortest_graphs.gexf')
         
         net = Network(heading='Weaver Words')
         net.inherit_edge_colors(False)
-        net.from_nx(graph)
+        net.from_nx(nx_graph)
         
         
         net.get_node(str(self.start_node))['color'] = '#00FF00'
@@ -158,7 +183,6 @@ class LoadGraph():
         start = net.get_node(str(self.start_node))
         end = net.get_node(str(self.end_node))
         print('start:', start, 'end:', end)
-        
         
         
         print(net.get_network_data())
@@ -177,6 +201,20 @@ if __name__ == '__main__':
     
     lg = LoadGraph()
     lg.get_new_game()
+    
+    
+    
+    
+    
+    
+    
+    ############ create graph and save as file ############
+    # shortest_graph = nx.Graph()
+    # shortest_graph.add_node(self.start_node, label=self.node_labels[self.start_node])
+    # for i in range(1, len(shortest_path)):
+    #     shortest_graph.add_node(shortest_path[i], label=self.node_labels[shortest_path[i]])
+    #     shortest_graph.add_edge(shortest_path[i-1], shortest_path[i])
+    # nx.write_gexf(shortest_graph, 'DataFiles/shortest_graph.gexf')
 
 
 

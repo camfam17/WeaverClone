@@ -85,8 +85,8 @@ class Main(CTk):
         self.message_label = CTkLabel(master=self, text='', width=word_frame_width, height=50, bg_color='#c5bebe')
         self.message_label.grid(row=3, column=1)
         
-        self.restart_button = CTkButton(master=self, text='Restart', command=self.restart)
-        self.restart_button.grid(row=4, column=1, pady=5)
+        self.new_game_button = CTkButton(master=self, text='New Game', command=self.new_game)
+        self.new_game_button.grid(row=4, column=1, pady=5)
         
         self.graph_button = CTkButton(master=self, text='View Graph', command=self.view_graph)
         self.graph_button.grid(row=5, column=1, pady=5)
@@ -99,13 +99,13 @@ class Main(CTk):
         g.view_graph()
     
     
-    def restart(self):
+    def new_game(self):
         
         print('restart')
         global words, start_word, end_word
         words = []
         
-        start_node, end_node, shortest_path, shortest_paths = g.get_new_game()
+        start_node, end_node, shortest_paths = g.get_new_game()
         start_word = four_letter_words[start_node][:-1]
         end_word = four_letter_words[end_node][:-1]
         
@@ -197,7 +197,7 @@ class Main(CTk):
         key_code = key.keycode
         
         if(self.is_game_over):
-            self.restart()
+            self.new_game()
             return
         
         if key_char == '\r': #ENTER
@@ -287,7 +287,7 @@ if __name__ == "__main__":
     
     letter_index = g.load_indices()
     
-    start_node, end_node, shortest_path, shortest_paths = g.get_new_game()
+    start_node, end_node, shortest_paths = g.get_new_game()
     
     start_word = four_letter_words[start_node][:-1]
     end_word = four_letter_words[end_node][:-1]
