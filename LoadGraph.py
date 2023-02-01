@@ -1,8 +1,8 @@
 import networkx as nx
 import random
 from pyvis.network import Network
-from pyvis.options import EdgeOptions
 import webbrowser
+import os
 
 
 # add ability to choose start word and/or end word
@@ -51,55 +51,91 @@ class LoadGraph():
         ############ select a random start word ############
         self.start_node = self.choose_start_node()
         
-        ######################### NB: this loop still spins sometimes. Must add fail counter! ###############################
-        # USED FOR STRAT 2
-        # and maybe have a failure counter and if the counter goes above a certain threshold then a new start word is chosen
-        
-        ############ find end word and path from start to end ############
-        # fail_count = -1
-        # while True:                      # NB: check that fail counter fixes infinite looping bug
-        #     fail_count += 1
-        #     self.end_node = random.randrange(0, len(self.graph.nodes))
-            
-        #     try:
-        #         shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=self.end_node)
-        #     except nx.exception.NetworkXNoPath:
-        #         continue
-            
-        #     print('fail count:', fail_count, 'end_word', self.nodes[self.end_node]['label'])
-        #     if(fail_count > 100):
-        #         self.start_node = self.choose_start_node()
-        #         fail_count = -1
-        #         continue
-            
-        #     if self.end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
-        #         break
-        # print('end node:', self.end_node, ':', self.node_labels[self.end_node])
-        
         self.end_node = self.select_valid_end_node()
-        shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
-        # all_paths = nx.all_simple_paths(G=self.graph, source=self.start_node, target=self.end_node, cutoff=6)
         
-        # print('shortest_path', shortest_path)
+        shortest_paths = list(nx.all_shortest_paths(G=self.graph, source=self.start_node, target=self.end_node))
         print('shortest_paths', shortest_paths)
-        # print('all_paths:', all_paths)
+        shortest_paths_plus_1 = list(nx.all_simple_paths(G=self.graph, source=self.start_node, target=self.end_node, cutoff=len(shortest_paths[0])+1))
+        # print('shortest_paths_plus_1', shortest_paths_plus_1)
         
         shortest_graphs = self.make_graph_from_list(shortest_paths)
         nx.write_gexf(shortest_graphs, 'DataFiles/shortest_graphs.gexf')
+        
+        shortest_graphs_plus_1 = self.make_graph_from_list(shortest_paths_plus_1)
+        nx.write_gexf(shortest_graphs_plus_1, 'DataFiles/shortest_graphs_plus_1.gexf')
         
         print('Done')
         return self.start_node, self.end_node, shortest_paths
     
     
-    def select_valid_end_node(self):
+    # function to take shortest_graphs and shortest_graphs_plus_1 and colour all common nodes an different colour
+    # TODO must remove redundancy between this and view_graph() function
+    def colour_common_nodes(self):
         
+        nxgraph1 = nx.read_gexf('DataFiles/shortest_graphs.gexf')
+        nxgraph2 = nx.read_gexf('DataFiles/shortest_graphs_plus_1.gexf')
+        
+        nodeslist1 = nxgraph1.nodes()
+        print('nodeslist1', nodeslist1)
+        
+        net2 = Network(heading='colour common nodes')
+        net2.inherit_edge_colors(False)
+        net2.from_nx(nxgraph2)
+        
+        for node in nodeslist1:
+            net2.get_node(node)['color'] = '#A020F0'
+        
+        net2.get_node(str(self.start_node))['color'] = '#00FF00'
+        net2.get_node(str(self.start_node))['shape'] = 'star'
+        net2.get_node(str(self.end_node))['color'] = '#FF0000'
+        net2.get_node(str(self.end_node))['shape'] = 'square'
+        
+        gen = net2.generate_html()
+        output = open('DataFiles/colour_common.html', 'w')
+        output.write(gen)
+        output.close()
+        self.display_graph_html('DataFiles/colour_common')
+    
+    
+    def display_graph_html(self, filename):
+        webbrowser.open_new_tab(os.getcwd() + '/' + filename + '.html')
+    
+    
+    def create_pyvis_graph(self, filename='DataFiles/shortest_graphs.gexf'):
+        
+        # nx_graph = nx.read_gexf('DataFiles/shortest_graphs.gexf')
+        nx_graph = nx.read_gexf(filename)
+        
+        net = Network(heading='Weaver Words')
+        net.inherit_edge_colors(False)
+        net.from_nx(nx_graph)
+        
+        net.get_node(str(self.start_node))['color'] = '#00FF00'
+        net.get_node(str(self.start_node))['shape'] = 'star'
+        net.get_node(str(self.end_node))['color'] = '#FF0000'
+        net.get_node(str(self.end_node))['shape'] = 'square'
+        
+        start = net.get_node(str(self.start_node))
+        end = net.get_node(str(self.end_node))
+        # print('start:', start, 'end:', end)
+        
+        gen = net.generate_html()
+        output = open(filename+'.html', 'w')
+        output.write(gen)
+        output.close()
+        self.display_graph_html(filename)
+    
+    
+    ############ find end word and path from start to end ############
+    def select_valid_end_node(self):
+        # USED FOR STRAT 2
         fail_count = -1
         while True:                      # NB: check that fail counter fixes infinite looping bug
             fail_count += 1
-            end_node = random.randrange(0, len(self.graph.nodes))
+            end_node = random.randrange(0, len(self.graph.nodes)) # choose a random end node
             
             try:
-                shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=end_node)
+                shortest_path = nx.shortest_path(G=self.graph, source=self.start_node, target=end_node) # ensure there is a path between start and end
             except nx.exception.NetworkXNoPath:
                 continue
             
@@ -109,9 +145,11 @@ class LoadGraph():
                 fail_count = -1
                 continue
             
-            if end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3:
+            ### TODO: should the 'end_node != self.start_node' be checked in the same line as 'end_node = random.randrange(0, len(self.graph.nodes))'?? (a few lines above)
+            if end_node != self.start_node and len(shortest_path) < 11 and len(shortest_path) > 3: # ensure the length between start and end is 4-10 words long
                 break
         print('end node:', end_node, ':', self.node_labels[end_node])
+        print('shortest_path length:', len(shortest_path))
         
         return end_node
     
@@ -163,38 +201,6 @@ class LoadGraph():
         
         return differ == 1
     
-    
-    def view_graph(self):
-        
-        print('view_graph')
-        
-        nx_graph = nx.read_gexf('DataFiles/shortest_graphs.gexf')
-        
-        net = Network(heading='Weaver Words')
-        net.inherit_edge_colors(False)
-        net.from_nx(nx_graph)
-        
-        
-        net.get_node(str(self.start_node))['color'] = '#00FF00'
-        net.get_node(str(self.start_node))['shape'] = 'star'
-        net.get_node(str(self.end_node))['color'] = '#FF0000'
-        net.get_node(str(self.end_node))['shape'] = 'square'
-        
-        start = net.get_node(str(self.start_node))
-        end = net.get_node(str(self.end_node))
-        print('start:', start, 'end:', end)
-        
-        
-        print(net.get_network_data())
-        
-        # net.save_graph('DataFiles/net.html')
-        # net.write_html('net.html')
-        # net.show('net.html')
-        gen = net.generate_html('net.html')
-        output = open('net.html', 'w')
-        output.write(gen)
-        output.close()
-        webbrowser.open_new_tab('net.html')
 
 
 if __name__ == '__main__':

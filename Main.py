@@ -96,16 +96,19 @@ class Main(CTk):
     
     
     def view_graph(self):
-        g.view_graph()
+        g.create_pyvis_graph()
+        g.create_pyvis_graph('DataFiles/shortest_graphs_plus_1.gexf')
+        g.colour_common_nodes()
     
     
+    # ADD RESTART BUTTON TO RESTART THE SAME GAME
     def new_game(self):
         
         print('restart')
         global words, start_word, end_word
         words = []
         
-        start_node, end_node, shortest_paths = g.get_new_game()
+        start_node, end_node, _ = g.get_new_game()
         start_word = four_letter_words[start_node][:-1]
         end_word = four_letter_words[end_node][:-1]
         
