@@ -6,6 +6,7 @@ import os
 
 
 # add ability to choose start word and/or end word
+# multithreading for path finding
 
 
 class LoadGraph():

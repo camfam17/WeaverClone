@@ -1,21 +1,23 @@
 <?xml version='1.0' encoding='utf-8'?>
 <gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
-  <meta lastmodifieddate="2023-02-01">
+  <meta lastmodifieddate="2023-02-02">
     <creator>NetworkX 2.8.8</creator>
   </meta>
   <graph defaultedgetype="undirected" mode="static" name="">
     <nodes>
-      <node id="1615" label="raps" />
-      <node id="1616" label="rapt" />
-      <node id="1613" label="rant" />
-      <node id="1639" label="rent" />
-      <node id="1766" label="sent" />
+      <node id="594" label="ergs" />
+      <node id="592" label="eras" />
+      <node id="237" label="bras" />
+      <node id="200" label="boas" />
+      <node id="199" label="boar" />
+      <node id="1671" label="roar" />
     </nodes>
     <edges>
-      <edge source="1615" target="1616" id="0" />
-      <edge source="1616" target="1613" id="1" />
-      <edge source="1613" target="1639" id="2" />
-      <edge source="1639" target="1766" id="3" />
+      <edge source="594" target="592" id="0" />
+      <edge source="592" target="237" id="1" />
+      <edge source="237" target="200" id="2" />
+      <edge source="200" target="199" id="3" />
+      <edge source="199" target="1671" id="4" />
     </edges>
   </graph>
 </gexf>
